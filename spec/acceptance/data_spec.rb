@@ -32,7 +32,33 @@ describe 'more complicated case' do
   end
 
   def expect_equal(h1, h2)
-    expect(JSON.parse(h1.to_json)).to eq JSON.parse(h2.to_json)
+    # sqlite uses Float instead of BigDecimal, we need to normalize the JSON objects to use the
+    # same data type so the values match. We also round these at 9 decimal places to account for
+    # rounding discrepencies between the two data types 
+
+    h1_json = JSON.parse(h1.to_json).map do |a|
+      a.deep_transform_values do |v|
+        case v
+        when String
+          BigDecimal(v).round(9) rescue v
+        else
+          v
+        end
+      end
+    end
+
+    h2_json = JSON.parse(h2.to_json).map do |a|
+      a.deep_transform_values do |v|
+        case v
+        when String
+          BigDecimal(v).round(9) rescue v
+        else
+          v
+        end
+      end
+    end
+
+    expect(h1_json).to eq h2_json
   end
 
   let(:joyce) { create(:author, name: 'James Joyce') }

@@ -1,5 +1,8 @@
-# class Float
-#   def as_json(options={})
-#     super&.to_s
-#   end
-# end
+# sqlite uses Float instead of BigDecimal, this extension to Float class ensures the seralized
+# objects match the test data in specs.
+
+class Float
+  def as_json(options={})
+    super&.to_s
+  end
+end
