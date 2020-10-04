@@ -29,5 +29,7 @@ jobs:
         ruby-version: 2.6
     - name: Install dependencies
       run: bundle install
-    - name: Run pecs
+    - name: Run specs (sqlite)
       run: bundle exec rspec
+      env:
+        DB: 'sqlite'
