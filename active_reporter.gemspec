@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = ActiveReporter::VERSION
   s.authors     = ['chaunce']
   s.email       = ['chaunce.slc@gmail.com']
-  s.homepage    = 'http://github.com/chaunce/repor'
+  s.homepage    = 'http://github.com/chaunce/active_reporter'
   s.summary     = 'Rails data aggregation framework'
   s.description = 'Flexible but opinionated framework for defining and running reports on Rails models backed by SQL databases.'
   s.license     = 'MIT'

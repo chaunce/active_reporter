@@ -1,4 +1,4 @@
-# ActiveReporter [![Actions Status](https://github.com/chaunce/repor/workflows/Ruby/badge.svg)](https://github.com/chaunce/repor/actions)
+# ActiveReporter [![Actions Status](https://github.com/chaunce/active_reporter/workflows/Ruby/badge.svg)](https://github.com/chaunce/active_reporter/actions)
 
 `ActiveReporter` is a framework for aggregating data about
 [Rails](http://rubyonrails.org) models backed by
