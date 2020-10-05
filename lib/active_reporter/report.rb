@@ -7,7 +7,7 @@ module ActiveReporter
     include ActiveReporter::Report::Metrics
     include ActiveReporter::Report::Aggregation    
 
-    attr_reader :params, :parent_report, :parent_groupers
+    attr_reader :params, :parent_report, :parent_groupers, :supplements
 
     def initialize(params = {})
       @params = params
@@ -22,6 +22,16 @@ module ActiveReporter
       # on a given row versus the total 'views' from the parent report.
       @parent_report = @params.delete(:parent_report)
       @parent_groupers = @params.delete(:parent_groupers) || ( grouper_names & Array(parent_report&.grouper_names) )
+
+      # Supplements -> supplemental reports and data
+      #
+      # we need 2 items:
+      # 1- the #supplements, a hash of reports and data, we can refrence by name
+      # => this is passed into the report initializer, the key is the name the value is the enrire report object
+      # 2- a configuration class, this will allow you to specify a special aggregator in the report class that
+      # => take a block. The block defines { |key, row| return_value }, the block has access to the data in
+      # #supplements available to use when calculating return the value.
+      @supplements = @params.delete(:supplements)
 
       # You may pass in pre-compiled :row_data if you don't want ActiveReporter to compile this data for you. All
       # :calculators and :trackers will still be processed when :raw_data is passed in.

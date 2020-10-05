@@ -36,7 +36,7 @@ module ActiveReporter
 
       private
 
-      def aggregate        
+      def aggregate
         tracker_dimension_key = :_tracker_dimension
 
         if trackable? && trackers.any?
@@ -53,7 +53,7 @@ module ActiveReporter
         source_data.each_with_object({}) do |current_obj, results|
           # collect all group values and append to results
           # for the results we store and use as the key prefix for each value
-          results_key_prefix = groupers.map { |g| g.extract_sql_value(current_obj) }
+          results_key_prefix = groupers.map { |g| g.extract_sql_value(current_obj) }.freeze
           # for the current_row appended as individual keys and values to the data object
           current_row = groupers.collect(&:name).zip(results_key_prefix).to_h.with_indifferent_access
 
@@ -98,6 +98,15 @@ module ActiveReporter
             end
           end
 
+          if evaluatable?
+            evaluators.each do |name, evaluator|
+              results_key = results_key_prefix + [name.to_s]
+              calculated_value = evaluator.evaluate(results_key, current_row, self) || evaluator.default_value
+              results[results_key] = calculated_value
+              current_row[name.to_s] = calculated_value
+            end
+          end
+
           prior_obj, prior_row = current_obj, current_row
         end
       end
@@ -119,6 +128,11 @@ module ActiveReporter
             tracker_group = group + [name.to_s]
             results[tracker_group] = trackable? ? (raw_data[tracker_group] || tracker.default_value) : nil
           end
+
+          evaluators.each do |name, evaluator|
+            evaluator_group = group + [name.to_s]
+            results[evaluator_group] = evaluatable? ? (raw_data[evaluator_group] || evaluator.default_value) : nil
+          end
         end
       end
 
@@ -135,6 +149,10 @@ module ActiveReporter
 
             trackers.each do |name, tracker|
               row[name] = trackable? ? (raw_data[group + [name.to_s]] || tracker.default_value) : nil
+            end
+
+            evaluators.each do |name, evaluator|
+              row[name] = evaluatable? ? (raw_data[group + [name.to_s]] || evaluator.default_value) : nil
             end
           end
         end
@@ -163,6 +181,11 @@ module ActiveReporter
 
             trackers.each do |name, tracker|
               value = trackable? ? (raw_data[value_prefix+[name.to_s]] || tracker.default_value) : nil
+              values.push({ key: name.to_s, value: value })
+            end
+
+            evaluators.each do |name, evaluator|
+              value = evaluatable? ? (raw_data[value_prefix+[name.to_s]] || evaluator.default_value) : nil
               values.push({ key: name.to_s, value: value })
             end
           end
@@ -248,6 +271,10 @@ module ActiveReporter
 
       def trackable?
         @trackable ||= tracker_dimension.is_a?(ActiveReporter::Dimension::Bin) && tracker_dimension.min.present?
+      end
+
+      def evaluatable?
+        @evaluatable ||= true
       end
 
       def tracker_dimension

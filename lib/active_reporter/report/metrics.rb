@@ -53,8 +53,12 @@ module ActiveReporter
         @trackers ||= build_axes(self.class.trackers.slice(*Array(params[:trackers]).collect(&:to_sym)))
       end
 
+      def evaluators
+        @evaluators ||= build_axes(self.class.evaluators.slice(*Array(params[:evaluators]).collect(&:to_sym)))
+      end
+
       def fields
-        [groupers, aggregate_fields].inject(&:merge)
+        [groupers, calculators.keys, trackers.keys, evaluators.keys].inject(&:merge)
       end
 
       def total_report
