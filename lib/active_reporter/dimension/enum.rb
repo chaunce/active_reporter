@@ -6,7 +6,7 @@ module ActiveReporter
       def group_values
         return filter_values if filtering?
 
-        i = report.groupers.key(self)
+        # i = report.groupers.key(self)
         all_values & report.raw_data.keys.map { |x| x[0] }.uniq
       end
 

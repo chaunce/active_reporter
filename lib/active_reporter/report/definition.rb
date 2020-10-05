@@ -5,7 +5,7 @@ module ActiveReporter
     module Definition
       extend ActiveSupport::Concern
 
-      METRICS = %i[aggregator calculator dimension tracker].collect do |type|
+      METRICS = %i[aggregator calculator dimension tracker evaluator].collect do |type|
         metrics = Dir.glob(File.join(__dir__, '..', type.to_s, '*.rb')).collect { |file| File.basename(file, '.rb') }.without(*%w[base bin]).collect(&:to_sym).sort.freeze
         [type, const_set(type.to_s.upcase, metrics)]
       end.to_h.sort.freeze
@@ -92,12 +92,22 @@ module ActiveReporter
         #
         # A tracker only performs additional calculations on already aggregated data, so an :aggregator value matching
         # the aggregator name must be passed in the opts.
-        def tracker(name, trackers_class, opts = {})
-          trackers[name.to_sym] = { axis_class: trackers_class, opts: opts }
+        def tracker(name, tracker_class, opts = {})
+          trackers[name.to_sym] = { axis_class: tracker_class, opts: opts }
         end
 
         def trackers
           @trackers ||= {}
+        end
+
+        # block_evaluator(:chargeback_ratio) { |row| supplemental_report_data.detect { |data| data[:id] == row[:id] }[:count] / row[:count] }
+        def evaluator(name, evaluator_class, opts = {})
+          raise 'needs block' unless opts.include?(:block)
+          evaluators[name.to_sym] = { axis_class: evaluator_class, opts: opts }
+        end
+
+        def evaluators
+          @evaluators ||= {}
         end
 
         def available_dimensions
@@ -112,7 +122,8 @@ module ActiveReporter
         METRICS.each do |type, mertics|
           mertics.each do |mertic|
             class_eval <<-METRIC_HELPERS, __FILE__, __LINE__ + 1
-              def #{mertic}_#{type}(name, opts = {})
+              def #{mertic}_#{type}(name, opts = {}, &block)
+                opts[:block] = block if block_given?
                 #{type}(name, #{(type.to_s + '/' + mertic.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
               end
             METRIC_HELPERS
