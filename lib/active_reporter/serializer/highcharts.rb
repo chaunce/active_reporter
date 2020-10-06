@@ -94,7 +94,7 @@ module ActiveReporter
         when 1
           dim1 = report.groupers.first
           [{
-            name: human_aggregator_label(report.aggregators),
+            name: human_aggregator_label(report.all_aggregators),
             data: report.data.map { |d1| {
               y: d1[:value].to_f,
               tooltip: tooltip_for(dim1 => d1),
@@ -115,8 +115,8 @@ module ActiveReporter
           ]
         end
         lines << [
-          human_aggregator_label(report.aggregators),
-          human_aggregator_value_label(report.aggregators, xes[report.groupers.first][:value])
+          human_aggregator_label(report.all_aggregators),
+          human_aggregator_value_label(report.all_aggregators, xes[report.groupers.first][:value])
         ]
         lines.map { |k, v| "<b>#{k}:</b> #{v}" }.join('<br/>')
       end
@@ -147,7 +147,7 @@ module ActiveReporter
       end
 
       def y_axis_title
-        human_aggregator_label(report.aggregators)
+        human_aggregator_label(report.all_aggregators)
       end
 
       def highcharts_options

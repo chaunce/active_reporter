@@ -12,7 +12,7 @@ module ActiveReporter
       end
 
       def aggregator_options
-        @agg_opts ||= report.aggregators.map { |name, agg| [human_aggregator_label(agg), name] }
+        @agg_opts ||= report.all_aggregators.map { |name, agg| [human_aggregator_label(agg), name] }
       end
 
       def dimension_options
