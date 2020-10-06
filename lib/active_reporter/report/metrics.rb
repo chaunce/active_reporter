@@ -57,6 +57,10 @@ module ActiveReporter
         @evaluators ||= build_axes(self.class.evaluators.slice(*(Array(params[:evaluators])+Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
+      def all_aggregators
+        aggregators.merge(calculators).merge(trackers).merge(evaluators)
+      end
+
       def fields
         [groupers, calculators.keys, trackers.keys, evaluators.keys].inject(&:merge)
       end

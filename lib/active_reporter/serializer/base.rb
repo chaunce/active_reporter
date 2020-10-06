@@ -85,7 +85,7 @@ module ActiveReporter
       end
 
       def axis_summary
-        y = human_aggregator_label(report.aggregators)
+        y = human_aggregator_label(report.all_aggregators)
         xes = report.groupers.map(&method(:human_dimension_label))
         count = "#{report.records.count} #{record_type.pluralize(report.records.count, :_gem_active_reporter)}"
         "#{y} by #{xes.to_sentence} for #{count}"
