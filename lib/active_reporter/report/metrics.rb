@@ -46,15 +46,15 @@ module ActiveReporter
       end
 
       def calculators
-        @calculators ||= build_axes(self.class.calculators.slice(*Array(params[:calculators]).collect(&:to_sym)))
+        @calculators ||= build_axes(self.class.calculators.slice(*(Array(params[:calculators])+Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def trackers
-        @trackers ||= build_axes(self.class.trackers.slice(*Array(params[:trackers]).collect(&:to_sym)))
+        @trackers ||= build_axes(self.class.trackers.slice(*(Array(params[:trackers])+Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def evaluators
-        @evaluators ||= build_axes(self.class.evaluators.slice(*Array(params[:evaluators]).collect(&:to_sym)))
+        @evaluators ||= build_axes(self.class.evaluators.slice(*(Array(params[:evaluators])+Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def fields
