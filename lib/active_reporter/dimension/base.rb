@@ -106,7 +106,7 @@ module ActiveReporter
       end
 
       def invalid_param!(param_key, message)
-        raise InvalidParamsError, "Invalid value for params[:dimensions] [:#{name}][:#{param_key}]: #{message}"
+        raise InvalidParamsError, "Invalid value for params[:dimensions][:#{name}][:#{param_key}]\n  :#{param_key} #{message}"
       end
 
       def table_name

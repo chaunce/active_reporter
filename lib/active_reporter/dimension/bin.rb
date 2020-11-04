@@ -100,7 +100,7 @@ module ActiveReporter
         bin_max = filter_values_for(:max).present? ? (max - bin_width) : max
         
         bin_count = (bin_max - bin_start)/(bin_width)
-        invalid_param!(:bin_width, "is too small for the domain; would generate #{bin_count} bins") if bin_count > max_bins
+        invalid_param!(:bin_width, "is too small for the domain; would generate #{bin_count.to_i} bins") if bin_count > max_bins
 
         bin_edge = bin_start
         bins = []

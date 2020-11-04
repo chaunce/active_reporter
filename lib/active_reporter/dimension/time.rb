@@ -11,7 +11,7 @@ module ActiveReporter
       def validate_params!
         super
 
-        invalid_param!(:bin_width, "must be a hash of one of #{STEPS} to an integer") if params.key?(:bin_width) && !valid_duration?(params[:bin_width])
+        invalid_param!(:bin_width, "must be a valid width value or a hash where each hash keys is a valid value and each hash value\n  is interger representing the count of the key width\n  valid :bin_width values include #{STEPS.to_sentence}.") if params.key?(:bin_width) && !valid_duration?(params[:bin_width])
       end
 
       def bin_width
@@ -42,18 +42,22 @@ module ActiveReporter
         case params[:bin_width]
         when Hash
           params[:bin_width].map { |step, n| n.send(step) }.sum
-        when String
-          n, step = params[:bin_width].split.map(&:strip)
+        when String, Symbol
+          n, step = params[:bin_width].to_s.split.map(&:strip)
+          if step.nil?
+            step = n
+            n = 1
+          end
           n.to_i.send(step)
         end
       end
 
-      def valid_duration?(d)
-        case d
+      def valid_duration?(duration)
+        case duration
         when Hash
-          d.all? { |step, n| step.to_sym.in?(STEPS) && n.is_a?(Numeric) }
-        when String
-          d =~ DURATION_PATTERN
+          duration.all? { |step, n| step.to_s.pluralize(:_gem_active_reporter).to_sym.in?(STEPS) && n.is_a?(Numeric) }
+        when String, Symbol
+          duration.to_s.pluralize(:_gem_active_reporter).to_sym.in?(STEPS) || duration =~ DURATION_PATTERN
         else
           false
         end
