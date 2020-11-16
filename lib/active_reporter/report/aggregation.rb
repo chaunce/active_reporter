@@ -197,7 +197,7 @@ module ActiveReporter
       def total
         results = @total_data || total_report.raw_data
 
-        results.merge!(results.collect do |row, value|
+        results.deep_merge!(results.collect do |row, value|
           calculators.collect do |name, calculator|
             row_data = hash_raw_row(row, value, ['totals'])
             calc_report = parent_report.total_report
