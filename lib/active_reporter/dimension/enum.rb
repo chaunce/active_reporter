@@ -6,8 +6,7 @@ module ActiveReporter
       def group_values
         return filter_values if filtering?
 
-        # i = report.groupers.key(self)
-        all_values & report.raw_data.keys.map { |x| x[0] }.uniq
+        all_values & report_values
       end
 
       def all_values
@@ -17,7 +16,14 @@ module ActiveReporter
       private
 
       def enum_values
-        model.defined_enums[attribute.to_s]
+        model.defined_enums[attribute.to_s] || {}
+      end
+
+      def report_values
+        return [] if report.raw_data.nil?
+
+        i = report.groupers.index(self)
+        report.raw_data.keys.map { |x| x[i] }.uniq
       end
 
       def sanitize_sql_value(value)
