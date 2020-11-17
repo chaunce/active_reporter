@@ -28,6 +28,7 @@ require "rails/test_help"
 require 'rspec/rails'
 require 'factory_bot_rails'
 require 'pry'
+require 'byebug'
 
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
