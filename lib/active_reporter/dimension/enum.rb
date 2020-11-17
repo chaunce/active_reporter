@@ -10,7 +10,7 @@ module ActiveReporter
       end
 
       def all_values
-        enum_values.keys.unshift(nil)
+        enum_values.keys.tap { |values| values.unshift(nil) unless values.include?(nil) }.uniq
       end
 
       private
