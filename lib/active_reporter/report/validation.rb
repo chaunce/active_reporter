@@ -41,7 +41,7 @@ module ActiveReporter
           if calculator.aggregator.nil?
             add_invalid_param_error(:calculator, ":#{calculator.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
           elsif aggregators.exclude?(calculator.aggregator)
-            add_invalid_param_error(:calculator, ":#{calculator.name} defines an valid aggregator :#{calculator.aggregator} (should be in #{self.class.aggregators.keys})")
+            add_invalid_param_error(:calculator, ":#{calculator.name} defines an invalid aggregator :#{calculator.aggregator} (should be in #{self.class.aggregators.keys})")
           end
         end
       end
@@ -55,7 +55,7 @@ module ActiveReporter
           if tracker.aggregator.nil?
             add_invalid_param_error(:tracker, ":#{tracker.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
           elsif aggregators.exclude?(tracker.aggregator)
-            add_invalid_param_error(:tracker, ":#{tracker.name} defines an valid aggregator :#{tracker.aggregator} (should be in #{self.class.aggregators.keys})")
+            add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid aggregator :#{tracker.aggregator} (should be in #{self.class.aggregators.keys})")
           end
         end
       end
