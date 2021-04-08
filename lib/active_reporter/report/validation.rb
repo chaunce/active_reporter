@@ -38,10 +38,13 @@ module ActiveReporter
         end
 
         calculators.values.each do |calculator|
-          if calculator.aggregator.nil?
+          case
+          when calculator.aggregator.nil?
             add_invalid_param_error(:calculator, ":#{calculator.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
-          elsif aggregators.exclude?(calculator.aggregator)
+          when self.class.aggregators.exclude?(calculator.aggregator)
             add_invalid_param_error(:calculator, ":#{calculator.name} defines an invalid aggregator :#{calculator.aggregator} (should be in #{self.class.aggregators.keys})")
+          when params.include?(:aggregators) && aggregators.exclude?(calculator.aggregator)
+            params[:aggregators].push(calculator.aggregator)
           end
         end
       end
@@ -52,14 +55,22 @@ module ActiveReporter
         end
 
         trackers.values.each do |tracker|
-          if tracker.aggregator.nil?
+          case
+          when tracker.aggregator.nil?
             add_invalid_param_error(:tracker, ":#{tracker.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
-          elsif aggregators.exclude?(tracker.aggregator)
+          when self.class.aggregators.exclude?(tracker.aggregator)
             add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid aggregator :#{tracker.aggregator} (should be in #{self.class.aggregators.keys})")
+          when params.include?(:aggregators) && aggregators.exclude?(tracker.aggregator)
+            params[:aggregators].push(tracker.aggregator)
           end
 
-          if tracker.prior_aggregator.present? && aggregators.exclude?(tracker.prior_aggregator)
-            add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid prior aggregator :#{tracker.prior_aggregator} (should be in #{self.class.aggregators.keys})")
+          if tracker.opts.include?(:prior_aggregator)
+            case
+            when self.class.aggregators.exclude?(tracker.prior_aggregator)
+              add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid prior aggregator :#{tracker.prior_aggregator} (should be in #{self.class.aggregators.keys})")
+            when params.include?(:aggregators) && aggregators.exclude?(tracker.prior_aggregator)
+              params[:aggregators].push(tracker.prior_aggregator)
+            end
           end
         end
       end
