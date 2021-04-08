@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_reporter (0.6.1)
+    active_reporter (0.6.2)
       deeply_enumerable (>= 0.9.3, < 2.0)
       rails (>= 5.1, < 6.1)
 
