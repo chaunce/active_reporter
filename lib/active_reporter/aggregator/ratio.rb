@@ -4,7 +4,7 @@ module ActiveReporter
       attr_reader :numerator, :denominator
 
       def function
-        "(#{numerator}/NULLIF(#{denominator},0))"
+        "(#{numerator}/NULLIF(#{denominator},0)::FLOAT)"
       end
 
       private
