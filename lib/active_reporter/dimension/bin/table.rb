@@ -35,7 +35,7 @@ module ActiveReporter
         end
 
         def any_contain(expr)
-          map { |bin| bin.contains_sql(expr) }.join(' OR ')
+          map { |bin| bin.contains_sql(expr) }.join(" OR ")
         end
       end
     end

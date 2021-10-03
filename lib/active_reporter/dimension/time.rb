@@ -1,12 +1,12 @@
-require 'active_reporter/inflector'
-require 'active_reporter/dimension/bin'
+require "active_reporter/inflector"
+require "active_reporter/dimension/bin"
 
 module ActiveReporter
   module Dimension
     class Time < Bin
       STEPS = %i(seconds minutes hours days weeks months years)
       BIN_STEPS = (STEPS - [:seconds]).map { |step| step.to_s.singularize(:_gem_active_reporter) }
-      DURATION_PATTERN = /\A\d+ (?:#{STEPS.map{ |step| "#{step}?" }.join('|')})\z/
+      DURATION_PATTERN = /\A\d+ (?:#{STEPS.map{ |step| "#{step}?" }.join("|")})\z/
 
       def validate_params!
         super
@@ -78,7 +78,7 @@ module ActiveReporter
 
       class Set < Bin::Set
         def parse(value)
-          ::Time.zone.parse(value.to_s.gsub('"', ''))
+          ::Time.zone.parse(value.to_s.gsub('"', ""))
         end
 
         def cast(value)

@@ -2,7 +2,7 @@ module ActiveReporter
   module Serializer
     class Highcharts < Table
       def colors
-        ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1']
+        ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1"]
       end
 
       def color_hash
@@ -118,7 +118,7 @@ module ActiveReporter
           human_aggregator_label(report.all_aggregators),
           human_aggregator_value_label(report.all_aggregators, xes[report.groupers.first][:value])
         ]
-        lines.map { |k, v| "<b>#{k}:</b> #{v}" }.join('<br/>')
+        lines.map { |k, v| "<b>#{k}:</b> #{v}" }.join("<br/>")
       end
 
       def filters_for(xes)
@@ -153,7 +153,7 @@ module ActiveReporter
       def highcharts_options
         {
           chart: {
-            type: 'column'
+            type: "column"
           },
           colors: colors,
           title: {
@@ -176,9 +176,9 @@ module ActiveReporter
             },
             stackLabels: {
               enabled: report.groupers.length >= 3,
-              format: '{stack}',
+              format: "{stack}",
               rotation: -45,
-              textAlign: 'left'
+              textAlign: "left"
             }
           },
           legend: {
@@ -190,7 +190,7 @@ module ActiveReporter
               events: {}
             },
             column: {
-              stacking: ('normal' if report.groupers.length >= 2)
+              stacking: ("normal" if report.groupers.length >= 2)
             }
           }
         }

@@ -2,7 +2,7 @@ module ActiveReporter
   module Aggregator
     class Count < ActiveReporter::Aggregator::Base
       def function
-        "COUNT(#{'DISTINCT' if distinct} #{expression})"
+        "COUNT(#{"DISTINCT" if distinct} #{expression})"
       end
 
       def default_value
@@ -16,7 +16,7 @@ module ActiveReporter
       end
 
       def column
-        opts.fetch(:column, 'id')
+        opts.fetch(:column, "id")
       end
     end
   end

@@ -21,7 +21,7 @@ module ActiveReporter
             when /^([^,]+),(.+)$/ then new($1, $2)
             when /^([^,]+),$/     then new($1, nil)
             when /^,(.+)$/        then new(nil, $1)
-            when ',', nil         then new(nil, nil)
+            when ",", nil         then new(nil, nil)
             else
               raise "Unexpected SQL bin format #{value}"
             end
@@ -104,8 +104,8 @@ module ActiveReporter
 
         def [](key)
           case key.to_s
-          when 'min' then min
-          when 'max' then max
+          when "min" then min
+          when "max" then max
           end
         end
 

@@ -22,5 +22,5 @@ module ActiveReporter
   end
 end
 
-require 'deeply_enumerable'
-Dir.glob(File.join(__dir__, 'active_reporter', '*/')).each { |file| require file.chomp('/') }
+require "deeply_enumerable"
+Dir.glob(File.join(__dir__, "active_reporter", "*/")).each { |file| require file.chomp("/") }

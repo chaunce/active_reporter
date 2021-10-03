@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 module ActiveReporter
   module Serializer
@@ -11,7 +11,7 @@ module ActiveReporter
       end
 
       def save(filename = self.filename)
-        File.open(filename, 'w') { |f| f.write data }
+        File.open(filename, "w") { |f| f.write data }
       end
 
       def filename

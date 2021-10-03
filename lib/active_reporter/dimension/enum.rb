@@ -1,4 +1,4 @@
-require 'active_reporter/dimension/category'
+require "active_reporter/dimension/category"
 
 module ActiveReporter
   module Dimension

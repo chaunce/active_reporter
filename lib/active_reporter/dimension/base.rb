@@ -79,7 +79,7 @@ module ActiveReporter
       end
 
       def sort_order
-        sort_desc? ? 'DESC' : 'ASC'
+        sort_desc? ? "DESC" : "ASC"
       end
 
       def nulls_last?
@@ -90,7 +90,7 @@ module ActiveReporter
 
       def null_order
         return unless ActiveReporter.database_type == :postgres
-        nulls_last? ? 'NULLS LAST' : 'NULLS FIRST'
+        nulls_last? ? "NULLS LAST" : "NULLS FIRST"
       end
 
       def params

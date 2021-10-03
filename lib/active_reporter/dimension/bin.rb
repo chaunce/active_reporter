@@ -1,4 +1,4 @@
-require 'active_reporter/dimension/base'
+require "active_reporter/dimension/base"
 
 module ActiveReporter
   module Dimension

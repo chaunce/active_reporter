@@ -1,10 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveReporter::Dimension::Bin::Table do
   let(:bin_set) { ActiveReporter::Dimension::Bin::Set }
 
-  describe '#filter' do
-    it 'ORs together predicates across bins' do
+  describe "#filter" do
+    it "ORs together predicates across bins" do
       table = described_class.new([
         bin_set.new(nil, nil),
         bin_set.new(0, nil),
@@ -12,14 +12,14 @@ describe ActiveReporter::Dimension::Bin::Table do
         bin_set.new(3, 5)
       ])
 
-      sql = table.filter(Post, 'x').to_sql
+      sql = table.filter(Post, "x").to_sql
 
       expect(sql).to include "WHERE (x IS NULL OR x >= 0 OR x < 10 OR (x >= 3 AND x < 5))"
     end
   end
 
-  describe '#group' do
-    it 'joins to a union of bin rows, then groups by the range' do
+  describe "#group" do
+    it "joins to a union of bin rows, then groups by the range" do
       table = described_class.new([
         bin_set.new(nil, nil),
         bin_set.new(0, nil),
@@ -27,7 +27,7 @@ describe ActiveReporter::Dimension::Bin::Table do
         bin_set.new(3, 5)
       ])
 
-      sql = table.group(Post, 'likes', 'likes').to_sql
+      sql = table.group(Post, "likes", "likes").to_sql
 
       expect(sql).to start_with "SELECT likes_bin_table.bin_text AS likes"
 

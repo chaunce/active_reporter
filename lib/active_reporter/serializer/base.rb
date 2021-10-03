@@ -1,4 +1,4 @@
-require 'active_reporter/inflector'
+require "active_reporter/inflector"
 
 module ActiveReporter
   module Serializer
@@ -13,7 +13,7 @@ module ActiveReporter
       # on the aggregators or dimension name.
 
       def human_aggregator_label(aggregators)
-        aggregators.keys.collect { |aggregator| aggregator.to_s.humanize }.join(' ')
+        aggregators.keys.collect { |aggregator| aggregator.to_s.humanize }.join(" ")
       end
 
       def human_dimension_label(dimension)
@@ -62,8 +62,8 @@ module ActiveReporter
 
       def time_formats
         {
-          minutes: '%F %k:%M', hours: '%F %k', days: '%F',
-          weeks: 'week of %F', months: '%Y-%m', years: '%Y'
+          minutes: "%F %k:%M", hours: "%F %k", days: "%F",
+          weeks: "week of %F", months: "%Y-%m", years: "%Y"
         }
       end
 
@@ -95,8 +95,8 @@ module ActiveReporter
         report.filters.flat_map do |dimension|
           human_dimension_label(dimension) + " = " + dimension.filter_values.map do |value|
             human_dimension_value_label(dimension, value)
-          end.to_sentence(last_word_connector: ', or ')
-        end.join('; ')
+          end.to_sentence(last_word_connector: ", or ")
+        end.join("; ")
       end
     end
   end

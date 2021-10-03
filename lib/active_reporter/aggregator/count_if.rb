@@ -2,7 +2,7 @@ module ActiveReporter
   module Aggregator
     class CountIf < ActiveReporter::Aggregator::Count
       def function
-        "COUNT(#{expression} IN (#{values.map(&:to_s).join(',')}) OR NULL)"
+        "COUNT(#{expression} IN (#{values.map(&:to_s).join(",")}) OR NULL)"
       end
 
       def default_value
@@ -16,7 +16,7 @@ module ActiveReporter
       end
 
       def column
-        super || 'id'
+        super || "id"
       end
     end
   end

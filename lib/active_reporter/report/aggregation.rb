@@ -197,11 +197,11 @@ module ActiveReporter
 
         results.deep_merge!(results.collect do |row, value|
           calculators.collect do |name, calculator|
-            row_data = hash_raw_row(row, value, ['totals'])
+            row_data = hash_raw_row(row, value, ["totals"])
             calc_report = parent_report.total_report
 
             parent_row = match_parent_row_for_calculator(row_data, calc_report, calculator)
-            [['totals', name.to_s], calculator.calculate(row_data, parent_row)] unless parent_row.nil?
+            [["totals", name.to_s], calculator.calculate(row_data, parent_row)] unless parent_row.nil?
           end
         end.flatten(1).to_h) unless parent_report.nil?
 
@@ -239,9 +239,9 @@ module ActiveReporter
         # tracker? Even if there is a "correct" method for one report it may not be correct for a different report. The
         # same problem applies to strings. Which character is after "z"? The ASCII hex value is "{", which would work
         # fine for ordering, but maybe not for determining when a tracker should be reset. Additionally, we need to
-        # deal with strings of different lengths. Alphabetically you could order 'A', 'AA', 'AAA', 'B' but how do know
-        # when to reset the tracker? If we get a new value of 'AAAA' we have entirelly new values used to calculate the
-        # tracker value for the 'B' row, effectivally making the tracker values irrelevent.
+        # deal with strings of different lengths. Alphabetically you could order "A", "AA", "AAA", "B" but how do know
+        # when to reset the tracker? If we get a new value of "AAAA" we have entirelly new values used to calculate the
+        # tracker value for the "B" row, effectivally making the tracker values irrelevent.
         # Even going back to the integer example, the value allowed to be stored increments by 1, but there is no
         # guerentee that these are the actual values being used in the field.
         # For these reasons we will not attempt to track any dimension that does not specifically specify a bin width.

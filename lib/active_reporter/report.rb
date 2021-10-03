@@ -1,4 +1,4 @@
-Dir.glob(File.join(__dir__, 'report', '*.rb')).each { |file| require file }
+Dir.glob(File.join(__dir__, "report", "*.rb")).each { |file| require file }
 
 module ActiveReporter
   class Report
@@ -18,8 +18,8 @@ module ActiveReporter
       # When using a Calculator you may need the parent report data. Pass in a ActiveReporter::Report object when
       # instantiating a new ActiveReporter::Report instance as :parent_report. This will allow you to calculate a data
       # based on the #total_report of this passed :parent_report. For example, if the parent report includes a sum
-      # aggregated 'views' column, the child report can use Report::Calculator::Ratio to caluclate the ratio of 'views'
-      # on a given row versus the total 'views' from the parent report.
+      # aggregated "views" column, the child report can use Report::Calculator::Ratio to caluclate the ratio of "views"
+      # on a given row versus the total "views" from the parent report.
       @parent_report = @params.delete(:parent_report)
       @parent_groupers = @params.delete(:parent_groupers) || ( grouper_names & Array(parent_report&.grouper_names) )
 

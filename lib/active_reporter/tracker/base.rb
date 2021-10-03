@@ -1,4 +1,4 @@
-require 'active_reporter/aggregator/base'
+require "active_reporter/aggregator/base"
 
 module ActiveReporter
   module Tracker

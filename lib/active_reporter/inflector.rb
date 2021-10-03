@@ -4,5 +4,5 @@ ActiveSupport::Inflector.inflections(:_gem_active_reporter) do |inflect|
     inflect.instance_variable_set("@#{var}", sys_inflect.send(var).dup)
   end
 
-  inflect.uncountable 'delta'
+  inflect.uncountable "delta"
 end

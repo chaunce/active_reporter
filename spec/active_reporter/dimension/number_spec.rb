@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe ActiveReporter::Dimension::Number do
   def new_dimension(dimension_params = {}, report_params = {}, opts = {})
@@ -14,23 +14,23 @@ describe ActiveReporter::Dimension::Number do
     expect { yield }.to raise_error(ActiveReporter::InvalidParamsError)
   end
 
-  describe 'param validation' do
-    it 'yells unless :bin_width is numeric' do
-      expect_error { new_dimension(bin_width: '') }
-      expect_error { new_dimension(bin_width: '49er') }
+  describe "param validation" do
+    it "yells unless :bin_width is numeric" do
+      expect_error { new_dimension(bin_width: "") }
+      expect_error { new_dimension(bin_width: "49er") }
       expect_error { new_dimension(bin_width: { seconds: 1 }) }
       expect(new_dimension(bin_width: 10.5).bin_width).to eq 10.5
-      expect(new_dimension(bin_width: '10').bin_width).to eq 10.0
+      expect(new_dimension(bin_width: "10").bin_width).to eq 10.0
     end
   end
 
-  describe '#bin_width' do
-    it 'reads from params' do
+  describe "#bin_width" do
+    it "reads from params" do
       dimension = new_dimension(bin_width: 7)
       expect(dimension.bin_width).to eq 7
     end
 
-    it 'can divide the domain into :bin_count bins' do
+    it "can divide the domain into :bin_count bins" do
       dimension = new_dimension(bin_count: 5, only: { min: 0, max: 5 })
       expect(dimension.bin_width).to eq 1
       allow(dimension).to receive(:data_contains_nil?).and_return(false)
@@ -43,7 +43,7 @@ describe ActiveReporter::Dimension::Number do
       ]
     end
 
-    it 'can include nils if they are present in the data' do
+    it "can include nils if they are present in the data" do
       dimension = new_dimension(bin_count: 3, only: { min: 0, max: 3 })
       allow(dimension).to receive(:data_contains_nil?).and_return(true)
       expect(dimension.group_values).to eq [
@@ -63,7 +63,7 @@ describe ActiveReporter::Dimension::Number do
       ]
     end
 
-    it 'defaults to 10 equal bins' do
+    it "defaults to 10 equal bins" do
       dimension = new_dimension(only: { min: 0, max: 5 })
       expect(dimension.bin_width).to eq 0.5
     end
