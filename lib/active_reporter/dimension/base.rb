@@ -71,7 +71,7 @@ module ActiveReporter
       end
 
       def order(relation)
-        relation.order("#{order_expression} #{sort_order} #{null_order}")
+        relation.order(Arel.sql("#{order_expression} #{sort_order} #{null_order}"))
       end
 
       def sort_desc?

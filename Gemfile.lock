@@ -194,6 +194,7 @@ DEPENDENCIES
   mysql2
   pg
   pry
+  rails (>= 6.0, < 7)
   rspec-rails
   simplecov
   sqlite3
