@@ -29,7 +29,6 @@ module ActiveReporter
 
       def source_data
         @source_data ||= aggregators.values.reduce(groups) do |relation, aggregator|
-          # append each aggregator into the base relation (groups)
           relation.merge(aggregator.aggregate(base_relation))
         end
       end
@@ -39,12 +38,11 @@ module ActiveReporter
       def aggregate
         tracker_dimension_key = :_tracker_dimension
 
-        if trackable? && trackers.any?
+        if trackable? && trackers.any? && prior_bin_report.source_data.present?
           prior_obj = prior_bin_report.source_data.first
           prior_row = prior_bin_report.hashed_data.first.with_indifferent_access
 
-          results_key_prefix = groupers.map { |g| g.extract_sql_value(prior_obj) }
-          prior_row[tracker_dimension_key] = results_key_prefix[0..-2]
+          prior_row[tracker_dimension_key] = groupers.without(tracker_dimension).map { |g| g.extract_sql_value(prior_obj) }
         else
           prior_obj = nil
           prior_row = {}
@@ -87,7 +85,7 @@ module ActiveReporter
           # "author.id" value (bin) changes the tracker is reset so we do not track changes from the last day of each
           # "author.id" to the first day of the next "author.id".
           if trackable?
-            current_row[tracker_dimension_key] = results_key_prefix[0..-2]
+            current_row[tracker_dimension_key] = groupers.without(tracker_dimension).map { |g| g.extract_sql_value(current_obj) }
 
             if current_row[tracker_dimension_key] == prior_row[tracker_dimension_key] && bins_are_adjacent?(current_obj, prior_obj)
               trackers.each do |name, tracker|
@@ -199,11 +197,11 @@ module ActiveReporter
 
         results.deep_merge!(results.collect do |row, value|
           calculators.collect do |name, calculator|
-            row_data = hash_raw_row(row, value, ['totals'])
+            row_data = hash_raw_row(row, value, ["totals"])
             calc_report = parent_report.total_report
 
             parent_row = match_parent_row_for_calculator(row_data, calc_report, calculator)
-            [['totals', name.to_s], calculator.calculate(row_data, parent_row)] unless parent_row.nil?
+            [["totals", name.to_s], calculator.calculate(row_data, parent_row)] unless parent_row.nil?
           end
         end.flatten(1).to_h) unless parent_report.nil?
 
@@ -241,9 +239,9 @@ module ActiveReporter
         # tracker? Even if there is a "correct" method for one report it may not be correct for a different report. The
         # same problem applies to strings. Which character is after "z"? The ASCII hex value is "{", which would work
         # fine for ordering, but maybe not for determining when a tracker should be reset. Additionally, we need to
-        # deal with strings of different lengths. Alphabetically you could order 'A', 'AA', 'AAA', 'B' but how do know
-        # when to reset the tracker? If we get a new value of 'AAAA' we have entirelly new values used to calculate the
-        # tracker value for the 'B' row, effectivally making the tracker values irrelevent.
+        # deal with strings of different lengths. Alphabetically you could order "A", "AA", "AAA", "B" but how do know
+        # when to reset the tracker? If we get a new value of "AAAA" we have entirelly new values used to calculate the
+        # tracker value for the "B" row, effectivally making the tracker values irrelevent.
         # Even going back to the integer example, the value allowed to be stored increments by 1, but there is no
         # guerentee that these are the actual values being used in the field.
         # For these reasons we will not attempt to track any dimension that does not specifically specify a bin width.
@@ -270,7 +268,7 @@ module ActiveReporter
       end
 
       def trackable?
-        @trackable ||= tracker_dimension.is_a?(ActiveReporter::Dimension::Bin) && tracker_dimension.min.present?
+        @trackable ||= tracker_dimension&.min.present?
       end
 
       def evaluatable?
@@ -278,7 +276,9 @@ module ActiveReporter
       end
 
       def tracker_dimension
-        @tracker_dimension ||= groupers.last
+        @tracker_dimension ||= (groupers.reverse + dimensions.values).detect do |dimension|
+          dimension.is_a?(ActiveReporter::Dimension::Bin) && %i[min max bin_width].all? { |a| dimension.try(a).present? }
+        end
       end
 
       def prior_bin_report

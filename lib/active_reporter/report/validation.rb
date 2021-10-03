@@ -1,5 +1,5 @@
-require 'active_reporter/inflector'
-require 'active_reporter/invalid_params_error'
+require "active_reporter/inflector"
+require "active_reporter/invalid_params_error"
 
 module ActiveReporter
   class Report
@@ -19,11 +19,11 @@ module ActiveReporter
       end
 
       def validate_configuration!
-        incomplete_message = ['You must declare at least one aggregator or tracker, and at lease one dimension to initialize a report', 'See the README for more details']
+        incomplete_message = ["You must declare at least one aggregator or tracker, and at lease one dimension to initialize a report", "See the README for more details"]
 
         raise ActiveReporter::InvalidParamsError, ["#{self.class.name} does not declare any aggregators or trackers"].concat(incomplete_message).join(". ") if aggregators.empty?
         raise ActiveReporter::InvalidParamsError, ["#{self.class.name} does not declare any dimensions"].concat(incomplete_message).join(". ") if dimensions.except(:totals).empty?
-        raise ActiveReporter::InvalidParamsError, 'parent_report must be included in order to process calculations' if calculators.any? && parent_report.nil?
+        raise ActiveReporter::InvalidParamsError, "parent_report must be included in order to process calculations" if calculators.any? && parent_report.nil?
       end
 
       def validate_aggregators!
@@ -81,8 +81,8 @@ module ActiveReporter
           invalid_groupers_message = [
             [
               invalid_groupers.to_sentence,
-              (invalid_groupers.one? ? 'is not a' : 'are not'), 'valid', 'dimension'.pluralize(invalid_groupers.count, :_gem_active_reporter)
-            ].join(' '),
+              (invalid_groupers.one? ? "is not a" : "are not"), "valid", "dimension".pluralize(invalid_groupers.count, :_gem_active_reporter)
+            ].join(" "),
             "declared dimension include #{dimensions.keys.to_sentence}"
           ].join(". ")
           add_invalid_param_error(:groupers, invalid_groupers_message)
@@ -90,11 +90,11 @@ module ActiveReporter
       end
 
       def validate_parent_report!
-        add_invalid_param_error(:parent_report, 'must be an instance of ActiveReporter::Report') unless parent_report.nil? || parent_report.kind_of?(ActiveReporter::Report)
+        add_invalid_param_error(:parent_report, "must be an instance of ActiveReporter::Report") unless parent_report.nil? || parent_report.kind_of?(ActiveReporter::Report)
       end
 
       def validate_total_report!
-        add_invalid_param_error(:total_report, 'must be an instance of ActiveReporter::Report') unless @total_report.nil? || @total_report.kind_of?(ActiveReporter::Report)
+        add_invalid_param_error(:total_report, "must be an instance of ActiveReporter::Report") unless @total_report.nil? || @total_report.kind_of?(ActiveReporter::Report)
       end
 
       private
@@ -114,7 +114,7 @@ module ActiveReporter
       end
 
       def error_message
-        (["The report configuration contains the following #{'error'.pluralize(errors.count, :_gem_active_reporter)}:"] + errors).join("\n - ")
+        (["The report configuration contains the following #{"error".pluralize(errors.count, :_gem_active_reporter)}:"] + errors).join("\n - ")
       end
     end
   end

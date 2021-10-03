@@ -11,12 +11,12 @@ defaults: &defaults
   pool: 5
   timeout: 5000
   host: localhost
-  <<: *<%= ENV['DB'] || 'postgres' %>
+  <<: *<%= ENV["DB"] || "postgres" %>
 
 development:
-  database: <%= ENV['DB'] == 'sqlite' ? 'db/development.sqlite3' : 'active_reporter_development' %>
+  database: <%= ENV["DB"] == "sqlite" ? "db/development.sqlite3" : "active_reporter_development" %>
   <<: *defaults
 
 test:
-  database: <%= ENV['DB'] == 'sqlite' ? 'db/test.sqlite3' : 'active_reporter_test' %>
+  database: <%= ENV["DB"] == "sqlite" ? "db/test.sqlite3" : "active_reporter_test" %>
   <<: *defaults

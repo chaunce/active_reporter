@@ -1,4 +1,4 @@
-require 'active_reporter/dimension/base'
+require "active_reporter/dimension/base"
 
 module ActiveReporter
   module Dimension
@@ -9,13 +9,32 @@ module ActiveReporter
         self.class::MAX_BINS
       end
 
+      # report values are greater than or equal to min, grouped by bin_width
       def min
         @min ||= filter_min || report.records.minimum(expression)
       end
       alias bin_start min
 
+      # report values are less than max, grouped by bin_width
       def max
         @max ||= filter_max || report.records.maximum(expression)
+      end
+
+      def bin_end
+        @bin_end ||= if max.blank? || min.blank? || min > max
+          nil
+        else
+          bin_edge = bin_start + bin_width
+
+          loop do
+            break if bin_edge >= max
+            bin_edge += bin_width
+          end
+
+          bin_edge += bin_width unless filter_values_for(:max).present? # # # figure out why we need this??
+
+          bin_edge
+        end
       end
 
       def filter_min
@@ -95,23 +114,12 @@ module ActiveReporter
       end
 
       def autopopulate_bins
-        return [] if bin_start.blank? || max.blank?
-
-        bin_max = filter_values_for(:max).present? ? (max - bin_width) : max
+        return [] if bin_start.blank? || bin_end.blank?
         
-        bin_count = (bin_max - bin_start)/(bin_width)
+        bin_count = ((bin_end - bin_start)/(bin_width)).to_i
         invalid_param!(:bin_width, "is too small for the domain; would generate #{bin_count.to_i} bins") if bin_count > max_bins
 
-        bin_edge = bin_start
-        bins = []
-
-        loop do
-          break if bin_edge > bin_max
-
-          bin = { min: bin_edge, max: bin_edge + bin_width }
-          bins << bin
-          bin_edge = bin[:max]
-        end
+        bins = bin_count.times.map { |i| { min: (bin_start + (bin_width*i)), max: (bin_start + (bin_width*i.next)) } }
 
         bins.reverse! if sort_desc?
         ( nulls_last? ? bins.push(nil) : bins.unshift(nil) ) if data_contains_nil?

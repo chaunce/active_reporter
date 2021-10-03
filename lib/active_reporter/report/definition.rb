@@ -1,4 +1,4 @@
-require 'active_reporter/inflector'
+require "active_reporter/inflector"
 
 module ActiveReporter
   class Report
@@ -6,7 +6,7 @@ module ActiveReporter
       extend ActiveSupport::Concern
 
       METRICS = %i[aggregator calculator dimension tracker evaluator].collect do |type|
-        metrics = Dir.glob(File.join(__dir__, '..', type.to_s, '*.rb')).collect { |file| File.basename(file, '.rb') }.without(*%w[base bin]).collect(&:to_sym).sort.freeze
+        metrics = Dir.glob(File.join(__dir__, "..", type.to_s, "*.rb")).collect { |file| File.basename(file, ".rb") }.without(*%w[base bin]).collect(&:to_sym).sort.freeze
         [type, const_set(type.to_s.upcase, metrics)]
       end.to_h.sort.freeze
 
@@ -102,7 +102,7 @@ module ActiveReporter
 
         # block_evaluator(:chargeback_ratio) { |row| supplemental_report_data.detect { |data| data[:id] == row[:id] }[:count] / row[:count] }
         def evaluator(name, evaluator_class, opts = {})
-          raise 'needs block' unless opts.include?(:block)
+          raise "needs block" unless opts.include?(:block)
           evaluators[name.to_sym] = { axis_class: evaluator_class, opts: opts }
         end
 
@@ -124,20 +124,20 @@ module ActiveReporter
             class_eval <<-METRIC_HELPERS, __FILE__, __LINE__ + 1
               def #{mertic}_#{type}(name, opts = {}, &block)
                 opts[:block] = block if block_given?
-                #{type}(name, #{(type.to_s + '/' + mertic.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
+                #{type}(name, #{(type.to_s + "/" + mertic.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
               end
             METRIC_HELPERS
           end
         end
 
         def default_report_model
-          name.demodulize.sub(/Report$/, '').constantize
+          name.demodulize.sub(/Report$/, "").constantize
         rescue NameError
           raise $!, "#{$!} cannot be used as `report_on` class, please configure `report_on` in the report class", $!.backtrace
         end
 
         def default_model
-          name.demodulize.sub(/Report$/, '').constantize
+          name.demodulize.sub(/Report$/, "").constantize
         end
 
         def report_model

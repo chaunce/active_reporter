@@ -3,15 +3,15 @@
 <div class='pure-g'>
   <div class='pure-u-12-24'>
     <h2>Form</h2>
-    <%= form_tag request.fullpath, method: 'get', id: 'report-form', autocomplete: 'off' do %>
+    <%= form_tag request.fullpath, method: "get", id: "report-form", autocomplete: "off" do %>
       <%= ActiveReporter::Serializer::FormField.new(@report).html_fields %><br>
-      <label><%= check_box_tag 'post_report[sort_desc]', "1", @report.params[:sort_desc].present? %> Sort Desc?</label><br>
-      <label><%= check_box_tag 'post_report[nulls_last]', "1", @report.params[:nulls_last].present? %> Nulls Last?</label><br>
-      <%= submit_tag 'Run report', class: 'pure-button pure-button-primary' %>
+      <label><%= check_box_tag "post_report[sort_desc]", "1", @report.params[:sort_desc].present? %> Sort Desc?</label><br>
+      <label><%= check_box_tag "post_report[nulls_last]", "1", @report.params[:nulls_last].present? %> Nulls Last?</label><br>
+      <%= submit_tag "Run report", class: "pure-button pure-button-primary" %>
     <% end %>
 
     <h2>CSV</h2><br>
-    <%= link_to 'Download CSV', request.query_parameters.merge(format: 'csv'), class: 'pure-button pure-button-primary' %>
+    <%= link_to "Download CSV", request.query_parameters.merge(format: "csv"), class: "pure-button pure-button-primary" %>
   </div>
 
   <div class='pure-u-12-24'>

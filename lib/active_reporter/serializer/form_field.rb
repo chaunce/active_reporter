@@ -95,23 +95,23 @@ module ActiveReporter
       end
 
       def axis_fields_class
-        'active-reporter-axis-fields'
+        "active-reporter-axis-fields"
       end
 
       def dimension_fields_class(dimension)
         [
-          'active-reporter-dimension-fields',
+          "active-reporter-dimension-fields",
           "active-reporter-dimension-fields--#{css_class(dimension.name)}",
           "active-reporter-dimension-fields--#{css_class(dimension.class.name)}"
-        ].join(' ')
+        ].join(" ")
       end
 
       def bin_max_placeholder(dimension)
-        'max'
+        "max"
       end
 
       def bin_min_placeholder(dimension)
-        'min'
+        "min"
       end
 
       def bin_step_placeholder(dimension)
