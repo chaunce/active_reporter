@@ -17,7 +17,11 @@ module ActiveReporter
     private
 
     def database_adapter
-      ActiveRecord::Base.connection_config[:adapter]
+      @database_adapter ||= if ActiveRecord.gem_version < Gem::Version.new("6")
+        ActiveRecord::Base.connection_config[:adapter]
+      else
+        ActiveRecord::Base.connection_db_config.adapter
+      end
     end
   end
 end
