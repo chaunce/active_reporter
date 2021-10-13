@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_reporter (0.6.4)
+    active_reporter (0.6.5)
       deeply_enumerable (>= 0.9.3, < 2.0)
       rails (>= 5.1, < 7)
 
@@ -100,7 +100,7 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (1.0.2)
     method_source (1.0.0)
-    mini_mime (1.1.1)
+    mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
     mysql2 (0.5.3)
@@ -200,4 +200,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   2.1.4
+   2.2.28
