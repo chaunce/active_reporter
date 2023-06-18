@@ -24,12 +24,12 @@ describe ActiveReporter::Report do
   let(:report) { report_model.new({groupers: groupers, aggregators: aggregators, dimensions: dimensions, parent_report: parent_report, parent_groupers: parent_groupers, calculators: calculators, trackers: trackers}.compact) }
 
   let(:year) { 1.year.ago.year }
-  
+
   let(:jan_datetime) { Time.new(year,1,1,0,0,0,0) }
   let(:feb_datetime) { Time.new(year,2,1,0,0,0,0) }
   let(:mar_datetime) { Time.new(year,3,1,0,0,0,0) }
   let(:apr_datetime) { Time.new(year,4,1,0,0,0,0) }
-  
+
   let(:jan) { { min: jan_datetime, max: jan_datetime.next_month } }
   let(:feb) { { min: feb_datetime, max: feb_datetime.next_month } }
   let(:mar) { { min: mar_datetime, max: mar_datetime.next_month } }
@@ -93,7 +93,7 @@ describe ActiveReporter::Report do
     let!(:author1_jan01_post) { create(:post, author: author1, created_at: Date.new(year,1,1), likes: 7) }
     let!(:author1_jan12_post) { create(:post, author: author1, created_at: Date.new(year,1,12), likes: 4) }
     let!(:author1_mar08_post) { create(:post, author: author1, created_at: Date.new(year,3,8), likes: 11) }
-    
+
     let!(:author2_jan15_post) { create(:post, author: author2, created_at: Date.new(year,1,15), likes: 3) }
     let!(:author2_feb27_post) { create(:post, author: author2, created_at: Date.new(year,2,27), likes: 24) }
     let!(:author2_feb28_post) { create(:post, author: author2, created_at: Date.new(year,2,28), likes: 0) }

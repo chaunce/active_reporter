@@ -115,7 +115,7 @@ module ActiveReporter
 
       def autopopulate_bins
         return [] if bin_start.blank? || bin_end.blank?
-        
+
         bin_count = ((bin_end - bin_start)/(bin_width)).to_i
         invalid_param!(:bin_width, "is too small for the domain; would generate #{bin_count.to_i} bins") if bin_count > max_bins
 

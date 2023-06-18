@@ -41,7 +41,7 @@ module ActiveReporter
         # this data, and so multiple aggregator types are provided.
         #
         # Average aggregator would calculate the average value across all the data in the group.
-        # 
+        #
         # Sum aggregator would calculate the sum total of all values across all the data in the group.
         #
         # Additional aggregators are also available for many other calculation types
@@ -86,7 +86,7 @@ module ActiveReporter
         # are configured and an aggregator to sum Likes is configured, a tracker to calculate Likes delta may also be
         # used. Each Published date the delta will be calculated, as long as the previous row has a Published date
         # sequentially immediately adjacent to the current row. If the bin with is date, the dates 2020/06/05 and
-        # 2020/06/06 are adjacent, but if there are no blog posts for 2020/06/07 then the dela will not be calculated
+        # 2020/06/06 are adjacent, but if there are no blog posts for 2020/06/07 then the delta will not be calculated
         # on the 2020/06/08 row since 2020/06/06 is not adjacent. Additionally, when the Author changes no delta will
         # be calculated, even if the Published date on the row is sequentially immediately adjacent.
         #

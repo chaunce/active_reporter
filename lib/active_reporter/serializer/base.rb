@@ -5,8 +5,9 @@ module ActiveReporter
     class Base
       attr_reader :report
 
-      def initialize(report)
+      def initialize(report, **options)
         @report = report
+        @options = options
       end
 
       # Consider overriding many of these methods to use I18n with keys based

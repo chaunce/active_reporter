@@ -62,7 +62,7 @@ class DataBuilder
         stddev_likes = gaussian(10, 2.5)
         h[author] = [average_likes, stddev_likes]
       end
-      
+
       likeability_for = Hash.new { |author_hash, author|
         author_hash[author] = Hash.new { |title_hash, title|
           average_likes, stddev_likes = author_likeability[author]

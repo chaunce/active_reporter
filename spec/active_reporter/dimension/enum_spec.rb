@@ -14,7 +14,7 @@ describe ActiveReporter::Dimension::Enum do
   let(:enum_values) { { "draft" => 0, "unpublished" => 1, "published" => 2, "archived" => 3 } }
   let(:group_values) { ["published", "archived"] }
   let(:all_values) { enum_values.keys.unshift(nil) }
-  
+
   let(:status_dimension) do
     dimension = ActiveReporter::Dimension::Enum.new(:status, report, { model: report_model, only: filter_values })
     allow(dimension).to receive(:enum_values).and_return(enum_values)

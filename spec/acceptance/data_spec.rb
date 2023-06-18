@@ -34,7 +34,7 @@ describe "more complicated case" do
   def expect_equal(h1, h2)
     # sqlite uses Float instead of BigDecimal, we need to normalize the JSON objects to use the
     # same data type so the values match. We also round these at 9 decimal places to account for
-    # rounding discrepencies between the two data types 
+    # rounding discrepancies between the two data types
 
     h1_json = JSON.parse(h1.to_json).map do |a|
       a.deep_transform_values do |v|
@@ -227,7 +227,7 @@ describe "more complicated case" do
           { key: :min_likes, value: 3 },
           { key: :max_likes, value: 3 }
         ] }
-      ] } 
+      ] }
     ]
   end
 

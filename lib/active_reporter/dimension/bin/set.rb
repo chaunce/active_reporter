@@ -136,7 +136,7 @@ module ActiveReporter
         alias eql? ==
 
         def bin_edges
-          case 
+          case
           when min_and_max? then :min_and_max
           when min? then :min
           when max? then :max
