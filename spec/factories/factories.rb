@@ -14,7 +14,6 @@ FactoryBot.define do
     end
   end
 
-  
   factory :post do
     status { :published }
     transient { author { nil } }

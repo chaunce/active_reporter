@@ -5,7 +5,7 @@ module ActiveReporter
     include ActiveReporter::Report::Definition
     include ActiveReporter::Report::Validation
     include ActiveReporter::Report::Metrics
-    include ActiveReporter::Report::Aggregation    
+    include ActiveReporter::Report::Aggregation
 
     attr_reader :params, :parent_report, :parent_groupers, :supplements
 
@@ -18,7 +18,7 @@ module ActiveReporter
       # When using a Calculator you may need the parent report data. Pass in a ActiveReporter::Report object when
       # instantiating a new ActiveReporter::Report instance as :parent_report. This will allow you to calculate a data
       # based on the #total_report of this passed :parent_report. For example, if the parent report includes a sum
-      # aggregated "views" column, the child report can use Report::Calculator::Ratio to caluclate the ratio of "views"
+      # aggregated "views" column, the child report can use Report::Calculator::Ratio to calculate the ratio of "views"
       # on a given row versus the total "views" from the parent report.
       @parent_report = @params.delete(:parent_report)
       @parent_groupers = @params.delete(:parent_groupers) || ( grouper_names & Array(parent_report&.grouper_names) )
@@ -26,8 +26,8 @@ module ActiveReporter
       # Supplements -> supplemental reports and data
       #
       # we need 2 items:
-      # 1- the #supplements, a hash of reports and data, we can refrence by name
-      # => this is passed into the report initializer, the key is the name the value is the enrire report object
+      # 1- the #supplements, a hash of reports and data, we can reference by name
+      # => this is passed into the report initializer, the key is the name the value is the entire report object
       # 2- a configuration class, this will allow you to specify a special aggregator in the report class that
       # => take a block. The block defines { |key, row| return_value }, the block has access to the data in
       # #supplements available to use when calculating return the value.
@@ -50,18 +50,17 @@ module ActiveReporter
 
       validate_params!
 
-      # After params are parsed and validated you can call #data (or any derivitive of: #raw_data, #flat_data,
+      # After params are parsed and validated you can call #data (or any derivative of: #raw_data, #flat_data,
       # #hashed_data, #nested_data, etc.) on the ActiveReporter::Report object to #aggregate the data. This will
       # aggregate all the raw data by the configured dimensions, process any calculators, and then process any
       # trackers.
-      
-      # Caclulators calculate values using the current row data and the #parent_report.
-      
+
+      # Calculators calculate values using the current row data and the #parent_report.
+
       # Trackers calculate values using the current row data and prior row data.
 
-
       # If pre-compiled raw data was passed in, process all :calculators and :trackers now.
-      aggregate if  @raw_data.present? && ( @params.include?(:calculators) || @params.include?(:trackers) )
+      aggregate if @raw_data.present? && ( @params.include?(:calculators) || @params.include?(:trackers) )
       total if @total_data.present?
     end
 

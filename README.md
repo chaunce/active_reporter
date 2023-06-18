@@ -283,7 +283,7 @@ params[:dimensions][<time dimension>][:bin_width] = { months: 2, hours: 2 }
 ```
 
 `Number`s will default to using 10 bins and `Time`s will
-default to using a sensical increment of time given the domain; you can
+default to using a sensible increment of time given the domain; you can
 customize this by overriding methods in those classes.
 
 Note that when you inspect `report.data` after grouping by a bin dimension, you

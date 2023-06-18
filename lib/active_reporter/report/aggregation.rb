@@ -80,7 +80,7 @@ module ActiveReporter
           # Trackers can only be applied if the last grouper is a bin dimension, since bin dimensions are series of the
           # same data set with a pre-defined sequence. Bin dimension results also allow us to determine if an empty set
           # is present, because the bins are pre-defined.
-          # If additional demensions are included the trackers reset each time these groups change. For example, if the
+          # If additional dimensions are included the trackers reset each time these groups change. For example, if the
           # category dimension "author.id" and time dimension "created_at" with bin_width "day" are used, each time the
           # "author.id" value (bin) changes the tracker is reset so we do not track changes from the last day of each
           # "author.id" to the first day of the next "author.id".
@@ -121,7 +121,6 @@ module ActiveReporter
             results[calculator_group] = calculable? ? (raw_data[calculator_group] || calculator.default_value) : nil
           end
 
-          
           trackers.each do |name, tracker|
             tracker_group = group + [name.to_s]
             results[tracker_group] = trackable? ? (raw_data[tracker_group] || tracker.default_value) : nil
@@ -234,18 +233,18 @@ module ActiveReporter
         # field with identical values. If the field type is integer we can deduce the bin width to be 1, but if the
         # type is string or float the the width is less evident.
         # For example, if the field is float and the first value is 1.0 should the next sequential value be 1.1? What
-        # if we have 1.0001? Should we skip 1.0002 if it does not exist and skip right to 1.01? What if we habe 1.0,
+        # if we have 1.0001? Should we skip 1.0002 if it does not exist and skip right to 1.01? What if we have 1.0,
         # 1.1, 1.11, and 1.13 but no 1.12? So we determine that 1.13 is sequentially after 1.11 or de we reset the
         # tracker? Even if there is a "correct" method for one report it may not be correct for a different report. The
         # same problem applies to strings. Which character is after "z"? The ASCII hex value is "{", which would work
         # fine for ordering, but maybe not for determining when a tracker should be reset. Additionally, we need to
         # deal with strings of different lengths. Alphabetically you could order "A", "AA", "AAA", "B" but how do know
-        # when to reset the tracker? If we get a new value of "AAAA" we have entirelly new values used to calculate the
-        # tracker value for the "B" row, effectivally making the tracker values irrelevent.
+        # when to reset the tracker? If we get a new value of "AAAA" we have entirely new values used to calculate the
+        # tracker value for the "B" row, effectively making the tracker values irrelevant.
         # Even going back to the integer example, the value allowed to be stored increments by 1, but there is no
-        # guerentee that these are the actual values being used in the field.
+        # guarantee that these are the actual values being used in the field.
         # For these reasons we will not attempt to track any dimension that does not specifically specify a bin width.
-        
+
         # Any class that inherits from Bin will be evaluated, this includes both Number and Time classes, all other
         # classes will be skipped.
         return false unless dimension.is_a?(ActiveReporter::Dimension::Bin)
