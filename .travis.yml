@@ -3,7 +3,7 @@ script:
   - bundle exec rspec
 language: ruby
 rvm:
-  - 2.2
+  - 3.3.5
 env:
   - DB=mysql
   - DB=postgres
