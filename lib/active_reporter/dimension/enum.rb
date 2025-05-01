@@ -13,6 +13,22 @@ module ActiveReporter
         enum_values.keys.tap { |values| values.unshift(nil) unless values.include?(nil) }.uniq
       end
 
+      def filter(relation)
+        values = if Rails.gem_version >= Gem::Version.new("7")
+          filter_values.map { |value| enum_values[value] }.uniq
+        else
+          filter_values
+        end
+        query = case values
+        when [] then "1=0"
+        when [nil] then "#{expression} IS NULL"
+        else
+          in_values = "#{expression} IN (?)"
+          values.include?(nil) ? "#{expression} IS NULL OR #{in_values}" : in_values
+        end
+        relation.where(query, values.compact)
+      end
+
       private
 
       def enum_values
@@ -31,7 +47,7 @@ module ActiveReporter
       end
 
       def enum?
-        true # Hash(model&.defined_enums).include?(attribute.to_s)
+        Hash(model&.defined_enums).include?(attribute.to_s)
       end
     end
   end
