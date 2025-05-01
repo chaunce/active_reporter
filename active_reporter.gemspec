@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", ">= 6.1", "< 8"
   s.add_dependency "deeply_enumerable", ">= 0.9.3", "< 2.0"
 
-  s.add_development_dependency "rails", ">= 6.0", "< 8"
   s.add_development_dependency "pg"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "mysql2"
