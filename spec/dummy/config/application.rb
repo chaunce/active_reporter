@@ -21,6 +21,9 @@ module Dummy
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
+
+    # Opt into Rails 8.1 behavior for to_time timezone preservation
+    config.active_support.to_time_preserves_timezone = :zone
   end
 end
 
