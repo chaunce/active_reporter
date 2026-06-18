@@ -31,36 +31,6 @@ describe "more complicated case" do
     report.data
   end
 
-  def expect_equal(h1, h2)
-    # sqlite uses Float instead of BigDecimal, we need to normalize the JSON objects to use the
-    # same data type so the values match. We also round these at 9 decimal places to account for
-    # rounding discrepancies between the two data types
-
-    h1_json = JSON.parse(h1.to_json).map do |a|
-      a.deep_transform_values do |v|
-        case v
-        when String
-          BigDecimal(v).round(9) rescue v
-        else
-          v
-        end
-      end
-    end
-
-    h2_json = JSON.parse(h2.to_json).map do |a|
-      a.deep_transform_values do |v|
-        case v
-        when String
-          BigDecimal(v).round(9) rescue v
-        else
-          v
-        end
-      end
-    end
-
-    expect(h1_json).to eq h2_json
-  end
-
   let(:joyce) { create(:author, name: "James Joyce") }
   let(:woolf) { create(:author, name: "Virginia Woolf") }
 
@@ -84,7 +54,7 @@ describe "more complicated case" do
   let!(:post_9) { create(:post, author: nil, published_at: nov_1, likes: 3) }
 
   specify "basic grouping, 1 grouper, no filters" do
-    expect_equal data_by(:author), [
+    expect(data_by(:author)).to match_report_data([
       { key: nil, values: [
         { key: :count, value: 2 },
         { key: :total_likes, value: 5 },
@@ -106,9 +76,9 @@ describe "more complicated case" do
         { key: :min_likes, value: 2 },
         { key: :max_likes, value: 3 }
       ] }
-    ]
+    ])
 
-    expect_equal data_by(:published_at, bin_width: "1 month"), [
+    expect(data_by(:published_at, bin_width: "1 month")).to match_report_data([
       { key: nil, values: [
         { key: :count, value: 2 },
         { key: :total_likes, value: 6 },
@@ -130,9 +100,9 @@ describe "more complicated case" do
         { key: :min_likes, value: 1 },
         { key: :max_likes, value: 3 }
       ] }
-    ]
+    ])
 
-    expect_equal data_by(:likes, bin_width: 1), [
+    expect(data_by(:likes, bin_width: 1)).to match_report_data([
       { key: { min: 1, max: 2 }, values: [
         { key: :count, value: 2 },
         { key: :total_likes, value: 2 },
@@ -154,11 +124,11 @@ describe "more complicated case" do
         { key: :min_likes, value: 3 },
         { key: :max_likes, value: 3 }
       ] }
-    ]
+    ])
   end
 
   specify "basic grouping, >=2 groupers, no filters" do
-    expect_equal data_by([:published_at, :author], bin_width: { months: 1 }), [
+    expect(data_by([:published_at, :author], bin_width: { months: 1 })).to match_report_data([
       { key: nil, values: [
         { key: nil,  values: [
           { key: :count, value: 0 },
@@ -228,11 +198,11 @@ describe "more complicated case" do
           { key: :max_likes, value: 3 }
         ] }
       ] }
-    ]
+    ])
   end
 
   specify "sorting with nulls (1 grouper)" do
-    expect_equal data_by(:author, sort_desc: true), [
+    expect(data_by(:author, sort_desc: true)).to match_report_data([
       { key: woolf.name, values: [
         { key: :count, value: 3 },
         { key: :total_likes, value: 8 },
@@ -254,9 +224,9 @@ describe "more complicated case" do
         {key: :min_likes, value: 2 },
         {key: :max_likes, value: 3 }
       ] }
-    ]
+    ])
 
-    expect_equal data_by(:published_at, bin_width: "1 month", sort_desc: true), [
+    expect(data_by(:published_at, bin_width: "1 month", sort_desc: true)).to match_report_data([
       { key: nov, values: [
         { key: :count, value: 3 },
         { key: :total_likes, value: 7 },
@@ -278,10 +248,10 @@ describe "more complicated case" do
         { key: :min_likes, value: 3 },
         { key: :max_likes, value: 3 }
       ] }
-    ]
+    ])
 
     if ActiveReporter.database_type == :postgres
-      expect_equal data_by(:author, nulls_last: true), [
+      expect(data_by(:author, nulls_last: true)).to match_report_data([
         { key: joyce.name, values: [
           { key: :count, value: 4 },
           { key: :total_likes, value: 7 },
@@ -303,9 +273,9 @@ describe "more complicated case" do
           { key: :min_likes, value: 2 },
           { key: :max_likes, value: 3 }
         ] }
-      ]
+      ])
 
-      expect_equal data_by(:author, sort_desc: true, nulls_last: true), [
+      expect(data_by(:author, sort_desc: true, nulls_last: true)).to match_report_data([
         { key: nil, values: [
           { key: :count, value: 2 },
           { key: :total_likes, value: 5 },
@@ -327,9 +297,9 @@ describe "more complicated case" do
           { key: :min_likes, value: 1 },
           { key: :max_likes, value: 3 }
         ] }
-      ]
+      ])
 
-      expect_equal data_by(:published_at, bin_width: "1 month", nulls_last: true), [
+      expect(data_by(:published_at, bin_width: "1 month", nulls_last: true)).to match_report_data([
         { key: oct, values: [
           { key: :count, value: 4 },
           { key: :total_likes, value: 7 },
@@ -351,9 +321,9 @@ describe "more complicated case" do
           { key: :min_likes, value: 3 },
           { key: :max_likes, value: 3 }
         ] }
-      ]
+      ])
 
-      expect_equal data_by(:published_at, bin_width: "1 month", sort_desc: true, nulls_last: true), [
+      expect(data_by(:published_at, bin_width: "1 month", sort_desc: true, nulls_last: true)).to match_report_data([
         { key: nil, values: [
           { key: :count, value: 2 },
           { key: :total_likes, value: 6 },
@@ -375,7 +345,7 @@ describe "more complicated case" do
           { key: :min_likes, value: 1 },
           { key: :max_likes, value: 2 }
         ] }
-      ]
+      ])
     end
   end
 end

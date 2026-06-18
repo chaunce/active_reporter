@@ -89,7 +89,7 @@ module ActiveReporter
       include_total_data = @params.include?(:total_data)
       total_data = @params.delete(:total_data) if include_total_data
 
-      DeeplyEnumerable::Hash.deep_compact(@params)
+      DeeplyEnumerable::Hash.deep_compact_blank(@params)
 
       # add raw report data back into params
       @params[:raw_data] = raw_data if include_raw_data

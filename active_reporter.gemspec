@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "rails", ">= 7.1", "< 9"
-  s.add_dependency "deeply_enumerable", ">= 0.9.3", "< 2.0"
+  s.add_dependency "deeply_enumerable", "~> 2.0"
+  s.add_dependency "csv", "~> 3.3"
 
   s.add_development_dependency "pg"
   s.add_development_dependency "sqlite3"
@@ -30,4 +31,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "faker"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "byebug"
+  s.add_development_dependency "ostruct"
 end

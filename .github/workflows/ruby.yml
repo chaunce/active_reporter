@@ -1,9 +1,6 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
-# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+# This workflow installs dependencies and runs the spec suite across a matrix of
+# Ruby versions and database adapters.
+# See: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
 
 name: Ruby
 
@@ -15,18 +12,54 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.3", "3.4", "4.0"]
+        db: ["sqlite", "postgres", "mysql"]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB: ${{ matrix.db }}
+      DB_HOST: 127.0.0.1
+      DB_USERNAME: ${{ matrix.db == 'mysql' && 'root' || 'postgres' }}
+      DB_PASSWORD: ${{ matrix.db == 'mysql' && 'root' || 'postgres' }}
+      # mysql2 (a dev dependency) compiles from source on every job. Ruby 4.0's
+      # toolchain defaults to C23, which rejects mysql2's K&R-style generated
+      # header; -std=gnu17 keeps it building. MAKEFLAGS=-e lets this env CC
+      # override the Makefile's. Harmless on Ruby 3.3/3.4.
+      MAKEFLAGS: "-e"
+      CC: "cc -std=gnu17"
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.3.5
-    - name: Install dependencies
-      run: bundle install
-    - name: Run specs (sqlite)
-      run: bundle exec rspec
-      env:
-        DB: 'sqlite'
+      - uses: actions/checkout@v4
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run specs (${{ matrix.db }})
+        run: bundle exec rspec

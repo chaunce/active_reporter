@@ -3,14 +3,18 @@ sqlite: &sqlite
 
 mysql: &mysql
   adapter: mysql2
+  username: <%= ENV["DB_USERNAME"] %>
+  password: <%= ENV["DB_PASSWORD"] %>
 
 postgres: &postgres
   adapter: postgresql
+  username: <%= ENV["DB_USERNAME"] %>
+  password: <%= ENV["DB_PASSWORD"] %>
 
 defaults: &defaults
   pool: 5
   timeout: 5000
-  host: localhost
+  host: <%= ENV["DB_HOST"] || "localhost" %>
   <<: *<%= ENV["DB"] || "postgres" %>
 
 development:
