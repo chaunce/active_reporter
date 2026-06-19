@@ -24,6 +24,7 @@ Gemspec/OrderedDependencies:
 # This cop supports safe autocorrection (--autocorrect).
 Layout/ElseAlignment:
   Exclude:
+    - 'lib/active_reporter/dimension/base.rb'
     - 'lib/active_reporter/dimension/bin.rb'
 
 # Offense count: 6
@@ -33,6 +34,7 @@ Layout/ElseAlignment:
 Layout/EndAlignment:
   Exclude:
     - 'lib/active_reporter.rb'
+    - 'lib/active_reporter/dimension/base.rb'
     - 'lib/active_reporter/dimension/bin.rb'
     - 'lib/active_reporter/dimension/bin/set.rb'
     - 'lib/active_reporter/dimension/enum.rb'
@@ -45,6 +47,7 @@ Layout/EndAlignment:
 # SupportedStylesAlignWith: start_of_line, relative_to_receiver
 Layout/IndentationWidth:
   Exclude:
+    - 'lib/active_reporter/dimension/base.rb'
     - 'lib/active_reporter/dimension/bin.rb'
     - 'lib/active_reporter/report/aggregation.rb'
 
