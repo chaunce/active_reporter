@@ -4,32 +4,39 @@ $:.push File.expand_path("../lib", __FILE__)
 require "active_reporter/version"
 
 # Describe your gem and declare its dependencies:
-Gem::Specification.new do |s|
-  s.name        = "active_reporter"
-  s.version     = ActiveReporter::VERSION
-  s.authors     = ["chaunce"]
-  s.email       = ["chaunce.slc@gmail.com"]
-  s.homepage    = "http://github.com/chaunce/active_reporter"
-  s.summary     = "Rails data aggregation framework"
-  s.description = "Flexible but opinionated framework for defining and running reports on Rails models backed by SQL databases."
-  s.license     = "MIT"
+Gem::Specification.new do |spec|
+  spec.name        = "active_reporter"
+  spec.version     = ActiveReporter::VERSION
+  spec.authors     = ["chaunce"]
+  spec.email       = ["chaunce.slc@gmail.com"]
+  spec.homepage    = "http://github.com/chaunce/active_reporter"
+  spec.summary     = "Rails data aggregation framework"
+  spec.description = "Flexible but opinionated framework for defining and running reports on Rails models backed by SQL databases."
+  spec.license     = "MIT"
 
-  s.files = Dir["lib/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
-  s.test_files = Dir["spec/**/*"]
+  spec.metadata = { rubygems_mfa_required: "true" }
+  spec.required_ruby_version = ">= 3.3"
 
-  s.add_dependency "rails", ">= 7.1", "< 9"
-  s.add_dependency "deeply_enumerable", "~> 2.0"
-  s.add_dependency "csv", "~> 3.3"
+  spec.files = Dir["lib/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  spec.test_files = Dir["spec/**/*"]
 
-  s.add_development_dependency "pg"
-  s.add_development_dependency "sqlite3"
-  s.add_development_dependency "mysql2"
-  s.add_development_dependency "rspec-rails"
-  s.add_development_dependency "factory_bot_rails"
-  s.add_development_dependency "database_cleaner"
-  s.add_development_dependency "pry"
-  s.add_development_dependency "faker"
-  s.add_development_dependency "simplecov"
-  s.add_development_dependency "byebug"
-  s.add_development_dependency "ostruct"
+  spec.add_dependency "rails", ">= 7.1", "< 9"
+  spec.add_dependency "deeply_enumerable", "~> 2.0"
+  spec.add_dependency "csv", "~> 3.3"
+
+  spec.add_development_dependency "pg"
+  spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "mysql2"
+  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "factory_bot_rails"
+  spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "faker"
+  spec.add_development_dependency "simplecov"
+  spec.add_development_dependency "byebug"
+  spec.add_development_dependency "ostruct"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "rubocop-performance"
+  spec.add_development_dependency "rubocop-packaging"
+  spec.add_development_dependency "rubocop-rspec"
 end

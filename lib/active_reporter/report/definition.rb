@@ -105,6 +105,7 @@ module ActiveReporter
         # block_evaluator(:chargeback_ratio) { |row| supplemental_report_data.detect { |data| data[:id] == row[:id] }[:count] / row[:count] }
         def evaluator(name, evaluator_class, options = {})
           raise "needs block" unless options.include?(:block)
+
           evaluators[name.to_sym] = { axis_class: evaluator_class, options: options }
         end
 

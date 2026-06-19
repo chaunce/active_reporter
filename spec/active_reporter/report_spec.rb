@@ -23,14 +23,14 @@ describe ActiveReporter::Report do
   let(:parent_groupers) { nil }
   let(:calculators) { nil }
   let(:trackers) { nil }
-  let(:report) { report_model.new({groupers: groupers, aggregators: aggregators, dimensions: dimensions, parent_report: parent_report, parent_groupers: parent_groupers, calculators: calculators, trackers: trackers}.compact) }
+  let(:report) { report_model.new({ groupers: groupers, aggregators: aggregators, dimensions: dimensions, parent_report: parent_report, parent_groupers: parent_groupers, calculators: calculators, trackers: trackers }.compact) }
 
   let(:year) { 1.year.ago.year }
 
-  let(:jan_datetime) { Time.new(year,1,1,0,0,0,0) }
-  let(:feb_datetime) { Time.new(year,2,1,0,0,0,0) }
-  let(:mar_datetime) { Time.new(year,3,1,0,0,0,0) }
-  let(:apr_datetime) { Time.new(year,4,1,0,0,0,0) }
+  let(:jan_datetime) { Time.new(year, 1, 1, 0, 0, 0, 0) }
+  let(:feb_datetime) { Time.new(year, 2, 1, 0, 0, 0, 0) }
+  let(:mar_datetime) { Time.new(year, 3, 1, 0, 0, 0, 0) }
+  let(:apr_datetime) { Time.new(year, 4, 1, 0, 0, 0, 0) }
 
   let(:jan) { { min: jan_datetime, max: jan_datetime.next_month } }
   let(:feb) { { min: feb_datetime, max: feb_datetime.next_month } }
@@ -84,21 +84,21 @@ describe ActiveReporter::Report do
 
   describe "data access" do
     let(:groupers) { %w(author created_at) }
-    let(:dimensions) { { created_at: { bin_width: { months: 1 }, only: { min: Date.new(year,1,1).to_s }}} }
+    let(:dimensions) { { created_at: { bin_width: { months: 1 }, only: { min: Date.new(year, 1, 1).to_s } } } }
 
     let(:author_tammy) { create(:author, name: "Tammy") }
     let(:author_timmy) { create(:author, name: "Timmy") }
 
-    let!(:post_tammy_dec18) { create(:post, author: author_tammy, created_at: Date.new(year.pred,12,18), likes: 23) }
-    let!(:post_tammy_jan01) { create(:post, author: author_tammy, created_at: Date.new(year,1,1), likes: 7) }
-    let!(:post_tammy_jan12) { create(:post, author: author_tammy, created_at: Date.new(year,1,12), likes: 4) }
-    let!(:post_tammy_mar08) { create(:post, author: author_tammy, created_at: Date.new(year,3,8), likes: 11) }
+    let!(:post_tammy_dec18) { create(:post, author: author_tammy, created_at: Date.new(year.pred, 12, 18), likes: 23) }
+    let!(:post_tammy_jan01) { create(:post, author: author_tammy, created_at: Date.new(year, 1, 1), likes: 7) }
+    let!(:post_tammy_jan12) { create(:post, author: author_tammy, created_at: Date.new(year, 1, 12), likes: 4) }
+    let!(:post_tammy_mar08) { create(:post, author: author_tammy, created_at: Date.new(year, 3, 8), likes: 11) }
 
-    let!(:post_timmy_jan15) { create(:post, author: author_timmy, created_at: Date.new(year,1,15), likes: 3) }
-    let!(:post_timmy_feb27) { create(:post, author: author_timmy, created_at: Date.new(year,2,27), likes: 24) }
-    let!(:post_timmy_feb28) { create(:post, author: author_timmy, created_at: Date.new(year,2,28), likes: 0) }
-    let!(:post_timmy_mar01) { create(:post, author: author_timmy, created_at: Date.new(year,3,1), likes: 19) }
-    let!(:post_timmy_apr08) { create(:post, author: author_timmy, created_at: Date.new(year,4,8), likes: 8) }
+    let!(:post_timmy_jan15) { create(:post, author: author_timmy, created_at: Date.new(year, 1, 15), likes: 3) }
+    let!(:post_timmy_feb27) { create(:post, author: author_timmy, created_at: Date.new(year, 2, 27), likes: 24) }
+    let!(:post_timmy_feb28) { create(:post, author: author_timmy, created_at: Date.new(year, 2, 28), likes: 0) }
+    let!(:post_timmy_mar01) { create(:post, author: author_timmy, created_at: Date.new(year, 3, 1), likes: 19) }
+    let!(:post_timmy_apr08) { create(:post, author: author_timmy, created_at: Date.new(year, 4, 8), likes: 8) }
 
     let(:author_tammy_dec_posts) { [post_tammy_dec18] }
     let(:author_tammy_jan_posts) { [post_tammy_jan01, post_tammy_jan12] }
@@ -197,9 +197,9 @@ describe ActiveReporter::Report do
 
     context "with calculators" do
       let(:parent_groupers) { %i(author) }
-      let(:parent_dimensions) { { created_at: { only: { min: Date.new(year,1,1).to_s }}} }
+      let(:parent_dimensions) { { created_at: { only: { min: Date.new(year, 1, 1).to_s } } } }
       let(:aggregators) { %i(count likes) }
-      let(:parent_report) { report_model.new({groupers: parent_groupers, dimensions: parent_dimensions, aggregators: aggregators}) }
+      let(:parent_report) { report_model.new(groupers: parent_groupers, dimensions: parent_dimensions, aggregators: aggregators) }
       let(:calculators) { %i(likes_ratio) }
 
       let(:author_tammy_posts) { [post_tammy_jan01, post_tammy_jan12, post_tammy_mar08] }
@@ -207,66 +207,101 @@ describe ActiveReporter::Report do
       let(:author_timmy_posts) { [post_timmy_jan15, post_timmy_feb27, post_timmy_feb28, post_timmy_mar01, post_timmy_apr08] }
       let(:author_timmy_posts_likes) { author_timmy_posts.sum(&:likes) }
 
-      let(:author_tammy_jan_likes_ratio) { author_tammy_jan_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_jan_likes/author_tammy_posts_likes.to_f)*100 }
-      let(:author_tammy_feb_likes_ratio) { author_tammy_feb_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_feb_likes/author_tammy_posts_likes.to_f)*100 }
-      let(:author_tammy_mar_likes_ratio) { author_tammy_mar_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_mar_likes/author_tammy_posts_likes.to_f)*100 }
-      let(:author_tammy_apr_likes_ratio) { author_tammy_apr_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_apr_likes/author_tammy_posts_likes.to_f)*100 }
+      let(:author_tammy_jan_likes_ratio) { author_tammy_jan_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_jan_likes / author_tammy_posts_likes.to_f) * 100 }
+      let(:author_tammy_feb_likes_ratio) { author_tammy_feb_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_feb_likes / author_tammy_posts_likes.to_f) * 100 }
+      let(:author_tammy_mar_likes_ratio) { author_tammy_mar_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_mar_likes / author_tammy_posts_likes.to_f) * 100 }
+      let(:author_tammy_apr_likes_ratio) { author_tammy_apr_posts.none? || author_tammy_posts_likes.zero? ? nil : (author_tammy_apr_likes / author_tammy_posts_likes.to_f) * 100 }
 
-      let(:author_timmy_jan_likes_ratio) { author_timmy_jan_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_jan_likes/author_timmy_posts_likes.to_f)*100 }
-      let(:author_timmy_feb_likes_ratio) { author_timmy_feb_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_feb_likes/author_timmy_posts_likes.to_f)*100 }
-      let(:author_timmy_mar_likes_ratio) { author_timmy_mar_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_mar_likes/author_timmy_posts_likes.to_f)*100 }
-      let(:author_timmy_apr_likes_ratio) { author_timmy_apr_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_apr_likes/author_timmy_posts_likes.to_f)*100 }
+      let(:author_timmy_jan_likes_ratio) { author_timmy_jan_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_jan_likes / author_timmy_posts_likes.to_f) * 100 }
+      let(:author_timmy_feb_likes_ratio) { author_timmy_feb_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_feb_likes / author_timmy_posts_likes.to_f) * 100 }
+      let(:author_timmy_mar_likes_ratio) { author_timmy_mar_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_mar_likes / author_timmy_posts_likes.to_f) * 100 }
+      let(:author_timmy_apr_likes_ratio) { author_timmy_apr_posts.none? || author_timmy_posts_likes.zero? ? nil : (author_timmy_apr_likes / author_timmy_posts_likes.to_f) * 100 }
 
       it "should calculate" do
         expect(report.data).to eq [
-          { key: jan, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_jan_count },
-              { key: "likes", value: author_tammy_jan_likes },
-              { key: "likes_ratio", value: author_tammy_jan_likes_ratio },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_jan_count },
-              { key: "likes", value: author_timmy_jan_likes },
-              { key: "likes_ratio", value: author_timmy_jan_likes_ratio },
-            ] },
-          ] },
-          { key: feb, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_feb_count },
-              { key: "likes", value: author_tammy_feb_likes },
-              { key: "likes_ratio", value: author_tammy_feb_likes_ratio },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_feb_count },
-              { key: "likes", value: author_timmy_feb_likes },
-              { key: "likes_ratio", value: author_timmy_feb_likes_ratio },
-            ] },
-          ] },
-          { key: mar, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_mar_count },
-              { key: "likes", value: author_tammy_mar_likes },
-              { key: "likes_ratio", value: author_tammy_mar_likes_ratio },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_mar_count },
-              { key: "likes", value: author_timmy_mar_likes },
-              { key: "likes_ratio", value: author_timmy_mar_likes_ratio },
-            ] },
-          ]},
-          { key: apr, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_apr_count },
-              { key: "likes", value: author_tammy_apr_likes },
-              { key: "likes_ratio", value: author_tammy_apr_likes_ratio },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_apr_count },
-              { key: "likes", value: author_timmy_apr_likes },
-              { key: "likes_ratio", value: author_timmy_apr_likes_ratio },
-            ] },
-          ]},
+          {
+            key: jan,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_jan_count },
+                  { key: "likes", value: author_tammy_jan_likes },
+                  { key: "likes_ratio", value: author_tammy_jan_likes_ratio },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_jan_count },
+                  { key: "likes", value: author_timmy_jan_likes },
+                  { key: "likes_ratio", value: author_timmy_jan_likes_ratio },
+                ]
+              },
+            ]
+          },
+          {
+            key: feb,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_feb_count },
+                  { key: "likes", value: author_tammy_feb_likes },
+                  { key: "likes_ratio", value: author_tammy_feb_likes_ratio },
+                ]
+              },
+              {
+                key: author_timmy.name, values: [
+                  { key: "count", value: author_timmy_feb_count },
+                  { key: "likes", value: author_timmy_feb_likes },
+                  { key: "likes_ratio", value: author_timmy_feb_likes_ratio },
+                ]
+              },
+            ]
+          },
+          {
+            key: mar,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_mar_count },
+                  { key: "likes", value: author_tammy_mar_likes },
+                  { key: "likes_ratio", value: author_tammy_mar_likes_ratio },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_mar_count },
+                  { key: "likes", value: author_timmy_mar_likes },
+                  { key: "likes_ratio", value: author_timmy_mar_likes_ratio },
+                ]
+              },
+            ]
+          },
+          {
+            key: apr,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_apr_count },
+                  { key: "likes", value: author_tammy_apr_likes },
+                  { key: "likes_ratio", value: author_tammy_apr_likes_ratio },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_apr_count },
+                  { key: "likes", value: author_timmy_apr_likes },
+                  { key: "likes_ratio", value: author_timmy_apr_likes_ratio },
+                ]
+              },
+            ]
+          },
         ]
       end
     end
@@ -281,66 +316,102 @@ describe ActiveReporter::Report do
       let(:author_timmy_posts) { [post_timmy_jan15, post_timmy_feb27, post_timmy_feb28, post_timmy_mar01, post_timmy_apr08] }
       let(:author_timmy_posts_likes) { author_timmy_posts.sum(&:likes) }
 
-      let(:author_tammy_jan_likes_delta) { author_tammy_dec_likes.zero? || author_tammy_jan_likes.zero? ? nil : (author_tammy_jan_likes/author_tammy_dec_likes.to_f)*100 }
-      let(:author_tammy_feb_likes_delta) { author_tammy_jan_likes.zero? || author_tammy_feb_likes.zero? ? nil : (author_tammy_feb_likes/author_tammy_jan_likes.to_f)*100 }
-      let(:author_tammy_mar_likes_delta) { author_tammy_feb_likes.zero? || author_tammy_mar_likes.zero? ? nil : (author_tammy_mar_likes/author_tammy_feb_likes.to_f)*100 }
-      let(:author_tammy_apr_likes_delta) { author_tammy_mar_likes.zero? || author_tammy_apr_likes.zero? ? nil : (author_tammy_apr_likes/author_tammy_mar_likes.to_f)*100 }
+      let(:author_tammy_jan_likes_delta) { author_tammy_dec_likes.zero? || author_tammy_jan_likes.zero? ? nil : (author_tammy_jan_likes / author_tammy_dec_likes.to_f) * 100 }
+      let(:author_tammy_feb_likes_delta) { author_tammy_jan_likes.zero? || author_tammy_feb_likes.zero? ? nil : (author_tammy_feb_likes / author_tammy_jan_likes.to_f) * 100 }
+      let(:author_tammy_mar_likes_delta) { author_tammy_feb_likes.zero? || author_tammy_mar_likes.zero? ? nil : (author_tammy_mar_likes / author_tammy_feb_likes.to_f) * 100 }
+      let(:author_tammy_apr_likes_delta) { author_tammy_mar_likes.zero? || author_tammy_apr_likes.zero? ? nil : (author_tammy_apr_likes / author_tammy_mar_likes.to_f) * 100 }
 
-      let(:author_timmy_jan_likes_delta) { author_timmy_dec_likes.zero? || author_timmy_jan_likes.zero? ? nil : (author_timmy_jan_likes/author_timmy_dec_likes.to_f)*100 }
-      let(:author_timmy_feb_likes_delta) { author_timmy_jan_likes.zero? || author_timmy_feb_likes.zero? ? nil : (author_timmy_feb_likes/author_timmy_jan_likes.to_f)*100 }
-      let(:author_timmy_mar_likes_delta) { author_timmy_feb_likes.zero? || author_timmy_mar_likes.zero? ? nil : (author_timmy_mar_likes/author_timmy_feb_likes.to_f)*100 }
-      let(:author_timmy_apr_likes_delta) { author_timmy_mar_likes.zero? || author_timmy_apr_likes.zero? ? nil : (author_timmy_apr_likes/author_timmy_mar_likes.to_f)*100 }
+      let(:author_timmy_jan_likes_delta) { author_timmy_dec_likes.zero? || author_timmy_jan_likes.zero? ? nil : (author_timmy_jan_likes / author_timmy_dec_likes.to_f) * 100 }
+      let(:author_timmy_feb_likes_delta) { author_timmy_jan_likes.zero? || author_timmy_feb_likes.zero? ? nil : (author_timmy_feb_likes / author_timmy_jan_likes.to_f) * 100 }
+      let(:author_timmy_mar_likes_delta) { author_timmy_feb_likes.zero? || author_timmy_mar_likes.zero? ? nil : (author_timmy_mar_likes / author_timmy_feb_likes.to_f) * 100 }
+      let(:author_timmy_apr_likes_delta) { author_timmy_mar_likes.zero? || author_timmy_apr_likes.zero? ? nil : (author_timmy_apr_likes / author_timmy_mar_likes.to_f) * 100 }
 
       it "should calculate" do
         expect(report.data).to eq [
-          { key: jan, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_jan_count },
-              { key: "likes", value: author_tammy_jan_likes },
-              { key: "likes_delta", value: author_tammy_jan_likes_delta },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_jan_count },
-              { key: "likes", value: author_timmy_jan_likes },
-              { key: "likes_delta", value: author_timmy_jan_likes_delta },
-            ] },
-          ] },
-          { key: feb, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_feb_count },
-              { key: "likes", value: author_tammy_feb_likes },
-              { key: "likes_delta", value: author_tammy_feb_likes_delta },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_feb_count },
-              { key: "likes", value: author_timmy_feb_likes },
-              { key: "likes_delta", value: author_timmy_feb_likes_delta },
-            ] },
-          ] },
-          { key: mar, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_mar_count },
-              { key: "likes", value: author_tammy_mar_likes },
-              { key: "likes_delta", value: author_tammy_mar_likes_delta },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_mar_count },
-              { key: "likes", value: author_timmy_mar_likes },
-              { key: "likes_delta", value: author_timmy_mar_likes_delta },
-            ] },
-          ]},
-          { key: apr, values: [
-            { key: author_tammy.name, values: [
-              { key: "count", value: author_tammy_apr_count },
-              { key: "likes", value: author_tammy_apr_likes },
-              { key: "likes_delta", value: author_tammy_apr_likes_delta },
-            ] },
-            { key: author_timmy.name, values: [
-              { key: "count", value: author_timmy_apr_count },
-              { key: "likes", value: author_timmy_apr_likes },
-              { key: "likes_delta", value: author_timmy_apr_likes_delta },
-            ] },
-          ]},
+          {
+            key: jan,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_jan_count },
+                  { key: "likes", value: author_tammy_jan_likes },
+                  { key: "likes_delta", value: author_tammy_jan_likes_delta },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_jan_count },
+                  { key: "likes", value: author_timmy_jan_likes },
+                  { key: "likes_delta", value: author_timmy_jan_likes_delta },
+                ]
+              },
+            ]
+          },
+          {
+            key: feb,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_feb_count },
+                  { key: "likes", value: author_tammy_feb_likes },
+                  { key: "likes_delta", value: author_tammy_feb_likes_delta },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_feb_count },
+                  { key: "likes", value: author_timmy_feb_likes },
+                  { key: "likes_delta", value: author_timmy_feb_likes_delta },
+                ]
+              },
+            ]
+          },
+          {
+            key: mar,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_mar_count },
+                  { key: "likes", value: author_tammy_mar_likes },
+                  { key: "likes_delta", value: author_tammy_mar_likes_delta },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_mar_count },
+                  { key: "likes", value: author_timmy_mar_likes },
+                  { key: "likes_delta", value: author_timmy_mar_likes_delta },
+                ]
+              },
+            ]
+          },
+          {
+            key: apr,
+            values: [
+              {
+                key: author_tammy.name,
+                values: [
+                  { key: "count", value: author_tammy_apr_count },
+                  { key: "likes", value: author_tammy_apr_likes },
+                  { key: "likes_delta", value: author_tammy_apr_likes_delta },
+                ]
+              },
+              {
+                key: author_timmy.name,
+                values: [
+                  { key: "count", value: author_timmy_apr_count },
+                  { key: "likes", value: author_timmy_apr_likes },
+                  { key: "likes_delta", value: author_timmy_apr_likes_delta },
+                ]
+              },
+            ]
+          },
         ]
       end
     end
@@ -386,7 +457,7 @@ describe ActiveReporter::Report do
   describe "#calculators" do
     let(:parent_groupers) { %i(author) }
     let(:aggregators) { %i(count likes) }
-    let(:parent_report) { report_model.new({groupers: parent_groupers, aggregators: aggregators}) }
+    let(:parent_report) { report_model.new(groupers: parent_groupers, aggregators: aggregators) }
     let(:calculators) { %i(likes_ratio) }
 
     it "should return configured calculators" do
@@ -397,7 +468,7 @@ describe ActiveReporter::Report do
   describe "#trackers" do
     let(:parent_groupers) { %i(author) }
     let(:aggregators) { %i(count likes) }
-    let(:parent_report) { report_model.new({groupers: parent_groupers, aggregators: aggregators}) }
+    let(:parent_report) { report_model.new(groupers: parent_groupers, aggregators: aggregators) }
     let(:trackers) { %i(likes_delta) }
 
     it "should return configured trackers" do
@@ -408,7 +479,7 @@ describe ActiveReporter::Report do
   describe "#params" do
     let(:author_phil) { create(:author, name: "Phil") }
     let(:author_phyllis) { create(:author, name: "Phyllis") }
-    let(:date) { Date.new(year,1,1) }
+    let(:date) { Date.new(year, 1, 1) }
     let(:author_phil_post1) { create(:post, author: author_phil, created_at: date) }
     let(:author_phil_post2) { create(:post, author: author_phil, created_at: date) }
     let(:author_phyllis_post1) { create(:post, author: author_phyllis, created_at: date) }
@@ -419,7 +490,7 @@ describe ActiveReporter::Report do
     let(:author_phyllis_posts) { [author_phyllis_post1, author_phyllis_post2] }
 
     context "where author dimension only allows empty string" do
-      let(:report) { report_model.new(dimensions: { author: { only: "" }}) }
+      let(:report) { report_model.new(dimensions: { author: { only: "" } }) }
 
       it "treats a blank-only filter as no filter" do
         expect(report.params).to be_blank
@@ -429,7 +500,7 @@ describe ActiveReporter::Report do
     end
 
     context "where author dimension only allows array of empty string" do
-      let(:report) { report_model.new(dimensions: { author: { only: [""] }}) }
+      let(:report) { report_model.new(dimensions: { author: { only: [""] } }) }
 
       it "treats an array of only blanks as no filter" do
         expect(report.params).to be_blank
@@ -439,7 +510,7 @@ describe ActiveReporter::Report do
     end
 
     context "where author dimension only allows empty string or Phil" do
-      let(:report) { report_model.new(dimensions: { author: { only: ["", author_phil.name] }}) }
+      let(:report) { report_model.new(dimensions: { author: { only: ["", author_phil.name] } }) }
 
       it "strips blank values but keeps the real ones" do
         expect(report.params).to be_present
@@ -449,7 +520,7 @@ describe ActiveReporter::Report do
     end
 
     context "where author dimension strips blank values and only allows empty string" do
-      let(:report) { report_model.new(strip_blanks: false, dimensions: { author: { only: "" }}) }
+      let(:report) { report_model.new(strip_blanks: false, dimensions: { author: { only: "" } }) }
 
       it "keeps blank values when strip_blanks is false" do
         expect(report.params).to be_present
@@ -459,7 +530,7 @@ describe ActiveReporter::Report do
     end
 
     context "where author dimension only allows nil" do
-      let(:report) { report_model.new(dimensions: { author: { only: nil }}) }
+      let(:report) { report_model.new(dimensions: { author: { only: nil } }) }
 
       it "keeps an explicit nil as a filter for missing values" do
         expect(report.params).to be_present
@@ -472,8 +543,8 @@ describe ActiveReporter::Report do
   describe "#parent_report" do
     let(:groupers) { %i(author created_at) }
     let(:aggregators) { %i(count likes) }
-    let(:dimensions) { { created_at: { bin_width: { months: 1 }}} }
-    let(:parent_report) { report_model.new({ groupers: %i(author), aggregators: aggregators }) }
+    let(:dimensions) { { created_at: { bin_width: { months: 1 } } } }
+    let(:parent_report) { report_model.new(groupers: %i(author), aggregators: aggregators) }
 
     it "should return passed parent report" do
       expect(report.parent_report).to be_a report_model
@@ -566,15 +637,15 @@ describe ActiveReporter::Report do
   describe "#total_data" do
     let(:groupers) { %w(author created_at) }
     let(:aggregators) { %i(count likes) }
-    let(:dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 }}} }
+    let(:dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 } } } }
 
     let(:author_timmy) { create(:author, name: "Timmy") }
     let(:author_tammy) { create(:author, name: "Tammy") }
-    let!(:author_timmy_jan01_post) { create(:post, author: author_timmy, created_at: Date.new(year,1,1), likes: 1) }
-    let!(:author_timmy_jan12_post) { create(:post, author: author_timmy, created_at: Date.new(year,1,12), likes: 2) }
-    let!(:author_tammy_jan15_post) { create(:post, author: author_tammy, created_at: Date.new(year,1,15), likes: 3) }
-    let!(:author_tammy_mar01_post) { create(:post, author: author_tammy, created_at: Date.new(year,3,1), likes: 4) }
-    let!(:author_tammy_mar15_post) { create(:post, author: author_tammy, created_at: Date.new(year,3,15), likes: 2) }
+    let!(:author_timmy_jan01_post) { create(:post, author: author_timmy, created_at: Date.new(year, 1, 1), likes: 1) }
+    let!(:author_timmy_jan12_post) { create(:post, author: author_timmy, created_at: Date.new(year, 1, 12), likes: 2) }
+    let!(:author_tammy_jan15_post) { create(:post, author: author_tammy, created_at: Date.new(year, 1, 15), likes: 3) }
+    let!(:author_tammy_mar01_post) { create(:post, author: author_tammy, created_at: Date.new(year, 3, 1), likes: 4) }
+    let!(:author_tammy_mar15_post) { create(:post, author: author_tammy, created_at: Date.new(year, 3, 15), likes: 2) }
 
     let(:all_posts) { [author_timmy_jan01_post, author_timmy_jan12_post, author_tammy_jan15_post, author_tammy_mar01_post, author_tammy_mar15_post] }
     let(:all_posts_count) { all_posts.count }
@@ -600,17 +671,17 @@ describe ActiveReporter::Report do
         end
       end
 
-      let(:dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 }}, author: { only: author_tammy.name }} }
-      let(:parent_dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 }}} }
+      let(:dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 } }, author: { only: author_tammy.name } } }
+      let(:parent_dimensions) { { likes: { bin_width: 1 }, created_at: { bin_width: { months: 1 } } } }
       let(:parent_groupers) { %i(author) }
       let(:calculators) { %i(likes_ratio) }
       let(:trackers) { %i(likes_delta) }
-      let(:parent_report) { parent_report_model.new({groupers: parent_groupers, aggregators: aggregators, dimensions: parent_dimensions}) }
+      let(:parent_report) { parent_report_model.new(groupers: parent_groupers, aggregators: aggregators, dimensions: parent_dimensions) }
 
       let(:author_tammy_posts) { [author_tammy_jan15_post, author_tammy_mar01_post, author_tammy_mar15_post] }
       let(:author_tammy_posts_count) { author_tammy_posts.count }
       let(:author_tammy_posts_likes) { author_tammy_posts.sum(&:likes) }
-      let(:author_tammy_posts_likes_ratio) { all_posts_likes.zero? ? nil : (author_tammy_posts_likes/all_posts_likes.to_f)*100 }
+      let(:author_tammy_posts_likes_ratio) { all_posts_likes.zero? ? nil : (author_tammy_posts_likes / all_posts_likes.to_f) * 100 }
 
       it "should calculate" do
         expect(report.total_data).to eq({
@@ -700,7 +771,12 @@ describe ActiveReporter::Report do
 
       it "auto-adds the aggregator and builds successfully" do
         expect {
-          report_model.new(groupers: %i[author], aggregators: [:count], calculators: [:likes_ratio], parent_report: parent_report)
+          report_model.new(
+            groupers: %i[author],
+            aggregators: [:count],
+            calculators: [:likes_ratio],
+            parent_report: parent_report
+          )
         }.not_to raise_error
       end
     end

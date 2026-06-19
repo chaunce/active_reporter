@@ -68,7 +68,7 @@ class DataBuilder
       likeability_for = Hash.new { |author_hash, author|
         author_hash[author] = Hash.new { |title_hash, title|
           average_likes, stddev_likes = author_likeability[author]
-          title_hash[title] = [average_likes * (1+rand), stddev_likes]
+          title_hash[title] = [average_likes * rand.next, stddev_likes]
         }
       }
 
@@ -76,7 +76,9 @@ class DataBuilder
         if rand < 0.5
           author = authors.sample
         else
-          author_index = gaussian(authors.length/2, authors.length/4).to_i
+          mean = authors.length / 2
+          stddev = authors.length / 4
+          author_index = gaussian(mean, stddev).to_i
           author = authors[author_index % authors.length]
         end
 

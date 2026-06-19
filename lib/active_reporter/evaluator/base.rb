@@ -5,7 +5,7 @@ module ActiveReporter
     class Base
       attr_reader :name, :report, :options
 
-      def initialize(name, report, options={})
+      def initialize(name, report, options = {})
         @name = name
         @report = report
         @options = options

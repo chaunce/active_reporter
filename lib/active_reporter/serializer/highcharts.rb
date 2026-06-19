@@ -37,11 +37,13 @@ module ActiveReporter
                   name: name,
                   (i == 0 ? :id : :linkedTo) => name,
                   color: color_for(dim2, d2[:key]),
-                  data: d2[:values].map { |d1| {
-                    y: aggregator_value(d1, aggregator).to_f,
-                    tooltip: tooltip_for({ dim1 => d1, dim2 => d2, dim3 => d3 }, aggregator),
-                    filters: filters_for(dim1 => d1, dim2 => d2, dim3 => d3)
-                  }}
+                  data: d2[:values].map do |d1|
+                    {
+                      y: aggregator_value(d1, aggregator).to_f,
+                      tooltip: tooltip_for({ dim1 => d1, dim2 => d2, dim3 => d3 }, aggregator),
+                      filters: filters_for(dim1 => d1, dim2 => d2, dim3 => d3)
+                    }
+                  end
                 }
               end
             end
@@ -53,11 +55,13 @@ module ActiveReporter
               {
                 name: series_name(human_dimension_value_label(dim2, d2[:key]), aggregator),
                 color: color_for(dim2, d2[:key]),
-                data: d2[:values].map { |d1| {
-                  y: aggregator_value(d1, aggregator).to_f,
-                  tooltip: tooltip_for({ dim1 => d1, dim2 => d2 }, aggregator),
-                  filters: filters_for(dim1 => d1, dim2 => d2)
-                }}
+                data: d2[:values].map do |d1|
+                  {
+                    y: aggregator_value(d1, aggregator).to_f,
+                    tooltip: tooltip_for({ dim1 => d1, dim2 => d2 }, aggregator),
+                    filters: filters_for(dim1 => d1, dim2 => d2)
+                  }
+                end
               }
             end
           end
@@ -66,11 +70,13 @@ module ActiveReporter
           report.all_aggregators.map do |aggregator, aggregator_axis|
             {
               name: human_aggregator_label(aggregator => aggregator_axis),
-              data: report.data.map { |d1| {
-                y: aggregator_value(d1, aggregator).to_f,
-                tooltip: tooltip_for({ dim1 => d1 }, aggregator),
-                filters: filters_for(dim1 => d1)
-              }}
+              data: report.data.map do |d1|
+                {
+                  y: aggregator_value(d1, aggregator).to_f,
+                  tooltip: tooltip_for({ dim1 => d1 }, aggregator),
+                  filters: filters_for(dim1 => d1)
+                }
+              end
             }
           end
         else

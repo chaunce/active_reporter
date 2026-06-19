@@ -10,8 +10,8 @@ describe ActiveReporter::Dimension::Bin::Set do
       expect(bin.max).to eq 2
 
       bin = described_class.from_hash(nil)
-      expect(bin.min).to eq nil
-      expect(bin.max).to eq nil
+      expect(bin.min).to be_nil
+      expect(bin.max).to be_nil
     end
   end
 
@@ -29,15 +29,15 @@ describe ActiveReporter::Dimension::Bin::Set do
 
       bin = described_class.from_sql("1,")
       expect(bin.min).to eq "1"
-      expect(bin.max).to eq nil
+      expect(bin.max).to be_nil
 
       bin = described_class.from_sql(",2")
-      expect(bin.min).to eq nil
+      expect(bin.min).to be_nil
       expect(bin.max).to eq "2"
 
       bin = described_class.from_sql(",")
-      expect(bin.min).to eq nil
-      expect(bin.max).to eq nil
+      expect(bin.min).to be_nil
+      expect(bin.max).to be_nil
     end
 
     it "raises on an unrecognized bin format" do

@@ -30,7 +30,7 @@ module ActiveReporter
       end
 
       def secondary_grouper_field
-        select_tag("#{prefix}[groupers][1]", options_for_select([[nil, nil]]+dimension_options, report.grouper_names[1]))
+        select_tag("#{prefix}[groupers][1]", options_for_select([[nil, nil]] + dimension_options, report.grouper_names[1]))
       end
 
       def axis_fields
@@ -128,8 +128,8 @@ module ActiveReporter
         "#{prefix}[dimensions][#{dimension.name}]"
       end
 
-      def css_class(s)
-        s.to_s.demodulize.underscore.dasherize
+      def css_class(name)
+        name.to_s.demodulize.underscore.dasherize
       end
     end
   end

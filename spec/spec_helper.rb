@@ -23,7 +23,7 @@ SimpleCov.start do
   add_group "Short files" do |src_file| src_file.lines.count < 5 end
 end
 
-require File.expand_path("../../spec/dummy/config/environment.rb",  __FILE__)
+require File.expand_path("../../spec/dummy/config/environment.rb", __FILE__)
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../../spec/dummy/db/migrate", __FILE__)]
 
 # Ensure the test database exists and its schema matches db/schema.rb, so the

@@ -1,0 +1,59 @@
+inherit_from: .rubocop_todo.yml
+
+plugins:
+  - rubocop-performance
+  - rubocop-packaging
+  - rubocop-rspec
+
+AllCops:
+  # Instructs RuboCop to extract your minimum supported Ruby version 
+  # directly from your *.gemspec file so rules match runtime requirements.
+  SuggestExtensions: false
+  NewCops: disable
+  Exclude:
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+
+Layout/ArgumentAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+
+Layout/CaseIndentation:
+  Enabled: true
+  EnforcedStyle: end
+
+Layout/FirstArrayElementIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+
+Layout/FirstHashElementIndentation:
+  Enabled: true
+  EnforcedStyle: consistent
+
+Layout/LineContinuationLeadingSpace:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented
+
+# Enforces that all public-facing files initialize with frozen strings
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# Enforces Multi-Factor Authentication for publishing safety
+Gemspec/RequireMFA:
+  Enabled: true
+
+# Matches the target Ruby versions perfectly
+Gemspec/RequiredRubyVersion:
+  Enabled: true
+
+# Requires development tools to remain inside the Gemfile, not the gemspec
+Gemspec/DevelopmentDependencies:
+  Enabled: true

@@ -79,7 +79,7 @@ module ActiveReporter
 
       def validate_groupers!
         unless groupers.all?(&:present?)
-          invalid_groupers = grouper_names.zip(groupers).collect { |k,v| k if v.nil? }.compact
+          invalid_groupers = grouper_names.zip(groupers).collect { |k, v| k if v.nil? }.compact
           invalid_groupers_message = [
             [
               invalid_groupers.to_sentence,

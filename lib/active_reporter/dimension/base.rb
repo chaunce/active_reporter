@@ -5,7 +5,7 @@ module ActiveReporter
     class Base
       attr_reader :name, :report, :options
 
-      def initialize(name, report, options={})
+      def initialize(name, report, options = {})
         @name = name
         @report = report
         @options = options
@@ -87,6 +87,7 @@ module ActiveReporter
 
       def null_order
         return unless ActiveReporter.database_type == :postgres
+
         nulls_last? ? "NULLS LAST" : "NULLS FIRST"
       end
 
@@ -128,6 +129,7 @@ module ActiveReporter
       def array_param(key)
         return [] unless params.key?(key)
         return [nil] if params[key].nil?
+
         Array.wrap(params[key])
       end
 

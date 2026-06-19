@@ -8,10 +8,12 @@ describe ActiveReporter::Dimension::Enum do
   let(:status_dimension_options) { { only: filter_values }.compact }
   let(:report) { OpenStruct.new(params: { dimensions: { status: status_dimension_options } }, groupers: [:status, :category], raw_data: raw_data) }
 
-  let(:raw_data) { {
-    ["published", "post_count"] => 5, ["published", "post_total"] => 500.00, ["published", "post_average"] => 100.00,
-    ["archived", "post_count"] => 7, ["archived", "post_total"] => 530.25, ["archived", "post_average"] => 75.75,
-  } }
+  let(:raw_data) do
+    {
+      ["published", "post_count"] => 5, ["published", "post_total"] => 500.00, ["published", "post_average"] => 100.00,
+      ["archived", "post_count"] => 7, ["archived", "post_total"] => 530.25, ["archived", "post_average"] => 75.75,
+    }
+  end
 
   let(:enum_values) { { "draft" => 0, "unpublished" => 1, "published" => 2, "archived" => 3 } }
   let(:group_values) { ["published", "archived"] }

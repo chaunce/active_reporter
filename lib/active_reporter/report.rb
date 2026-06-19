@@ -23,7 +23,7 @@ module ActiveReporter
       # aggregated "views" column, the child report can use Report::Calculator::Ratio to calculate the ratio of "views"
       # on a given row versus the total "views" from the parent report.
       @parent_report = @params.delete(:parent_report)
-      @parent_groupers = @params.delete(:parent_groupers) || ( grouper_names & Array(parent_report&.grouper_names) )
+      @parent_groupers = @params.delete(:parent_groupers) || (grouper_names & Array(parent_report&.grouper_names))
 
       # Supplements -> supplemental reports and data
       #
@@ -62,7 +62,7 @@ module ActiveReporter
       # Trackers calculate values using the current row data and prior row data.
 
       # If pre-compiled raw data was passed in, process all :calculators and :trackers now.
-      aggregate if @raw_data.present? && ( @params.include?(:calculators) || @params.include?(:trackers) )
+      aggregate if @raw_data.present? && (@params.include?(:calculators) || @params.include?(:trackers))
       total if @total_data.present?
     end
 

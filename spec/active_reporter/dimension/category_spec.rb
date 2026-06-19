@@ -4,8 +4,9 @@ require "spec_helper"
 
 describe ActiveReporter::Dimension::Category do
   def author_dimension(report)
-    described_class.new(:author, report, model: :authors, attribute: :name, relation: ->(r) { r.joins(
-      "LEFT OUTER JOIN authors ON authors.id = posts.author_id") })
+    described_class.new(:author, report, model: :authors, attribute: :name, relation: ->(r) {
+      r.joins("LEFT OUTER JOIN authors ON authors.id = posts.author_id")
+    })
   end
 
   describe "#filter" do

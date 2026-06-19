@@ -74,7 +74,7 @@ describe ActiveReporter::Aggregator do
     let(:aggregators) { :mean_likes }
 
     it "should return mean_likes values" do
-      expect(report.raw_data.collect{ |k,v| [k, v.round(2)] }.to_h).to eq({
+      expect(report.raw_data.collect { |k, v| [k, v.round(2)] }.to_h).to eq({
         ["Alice", "published", "mean_likes"] => 2.50,
         ["Bob", "published", "mean_likes"] => 3.33,
         ["Chester", "published", "mean_likes"] => 10.00,

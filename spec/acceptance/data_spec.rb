@@ -132,7 +132,7 @@ describe "more complicated case" do
   it "basic grouping, >=2 groupers, no filters" do
     expect(data_by([:published_at, :author], bin_width: { months: 1 })).to match_report_data([
       { key: nil, values: [
-        { key: nil,  values: [
+        { key: nil, values: [
           { key: :count, value: 0 },
           { key: :total_likes, value: 0 },
           { key: :mean_likes, value: nil },
@@ -155,7 +155,7 @@ describe "more complicated case" do
         ] }
       ] },
       { key: joyce.name, values: [
-        { key: nil,  values: [
+        { key: nil, values: [
           { key: :count, value: 1 },
           { key: :total_likes, value: 3 },
           { key: :mean_likes, value: "3.0" },
@@ -178,7 +178,7 @@ describe "more complicated case" do
         ] }
       ] },
       { key: woolf.name, values: [
-        { key: nil,  values: [
+        { key: nil, values: [
           { key: :count, value: 1 },
           { key: :total_likes, value: 3 },
           { key: :mean_likes, value: "3.0" },
@@ -220,11 +220,11 @@ describe "more complicated case" do
         { key: :max_likes, value: 3 }
       ] },
       { key: nil, values: [
-        {key: :count, value: 2 },
-        {key: :total_likes, value: 5 },
-        {key: :mean_likes, value: "2.5" },
-        {key: :min_likes, value: 2 },
-        {key: :max_likes, value: 3 }
+        { key: :count, value: 2 },
+        { key: :total_likes, value: 5 },
+        { key: :mean_likes, value: "2.5" },
+        { key: :min_likes, value: 2 },
+        { key: :max_likes, value: 3 }
       ] }
     ])
 

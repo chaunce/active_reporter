@@ -52,7 +52,7 @@ describe ActiveReporter::Serializer::NestedHashWithId do
     end
 
     context "without :id_delimiter option" do
-      let(:id_delimiter) { ActiveReporter::Serializer::NestedHashWithId::ID_DELIMITER  }
+      let(:id_delimiter) { ActiveReporter::Serializer::NestedHashWithId::ID_DELIMITER }
 
       it "builds report" do
         expect(nested_hash_with_id.table).to eq({

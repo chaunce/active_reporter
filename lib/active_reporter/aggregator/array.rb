@@ -5,6 +5,7 @@ module ActiveReporter
     class Array < ActiveReporter::Aggregator::Base
       def aggregate(groups)
         fail InvalidParamsError, "array aggregator is only supported in Postgres" unless ActiveReporter.database_type == :postgres
+
         super
       end
 

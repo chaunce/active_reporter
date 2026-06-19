@@ -4,7 +4,7 @@
 # objects match the test data in specs.
 
 class Float
-  def as_json(options={})
+  def as_json(options = {})
     super&.to_s
   end
 end
