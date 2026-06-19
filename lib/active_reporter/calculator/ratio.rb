@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Calculator
     class Ratio < ActiveReporter::Calculator::Base

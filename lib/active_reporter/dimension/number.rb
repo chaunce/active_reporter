@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/dimension/bin"
 
 module ActiveReporter

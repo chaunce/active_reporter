@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostReport < ActiveReporter::Report
   report_on :post
   count_aggregator :count

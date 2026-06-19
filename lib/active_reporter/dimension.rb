@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/dimension/base"
 require "active_reporter/dimension/bin"
 require "active_reporter/dimension/bin/set"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DataBuilder
   class << self
     def gaussian(mean, stddev)

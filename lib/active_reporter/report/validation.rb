@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/inflector"
 require "active_reporter/invalid_params_error"
 

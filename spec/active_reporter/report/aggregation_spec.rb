@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 # Exercises calculators, trackers, and (block) evaluators flowing through every

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Compares report data structurally while treating numeric values as equal when
 # they're within a small tolerance. This keeps the acceptance expectations
 # adapter-agnostic: Postgres returns AVG() as BigDecimal, SQLite as Float, and

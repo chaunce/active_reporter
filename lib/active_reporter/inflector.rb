@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveSupport::Inflector.inflections(:_gem_active_reporter) do |inflect|
   sys_inflect = ActiveSupport::Inflector.inflections
   %i(acronyms humans uncountables singulars plurals acronyms_camelize_regex acronyms_underscore_regex).each do |var|

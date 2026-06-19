@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/aggregator/base"
 require "active_reporter/aggregator/array"
 require "active_reporter/aggregator/average"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/serializer/base"
 require "active_reporter/serializer/table"
 require "active_reporter/serializer/csv"
