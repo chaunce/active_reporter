@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   class Report
     module Aggregation
@@ -167,22 +169,22 @@ module ActiveReporter
             values = nest_data(nest_groupers, value_prefix)
           else
             aggregators.each do |name, aggregator|
-              value = raw_data[value_prefix+[name.to_s]] || aggregator.default_value
+              value = raw_data[value_prefix + [name.to_s]] || aggregator.default_value
               values.push({ key: name.to_s, value: value })
             end
 
             calculators.each do |name, calculator|
-              value = calculable? ? (raw_data[value_prefix+[name.to_s]] || calculator.default_value) : nil
+              value = calculable? ? (raw_data[value_prefix + [name.to_s]] || calculator.default_value) : nil
               values.push({ key: name.to_s, value: value })
             end
 
             trackers.each do |name, tracker|
-              value = trackable? ? (raw_data[value_prefix+[name.to_s]] || tracker.default_value) : nil
+              value = trackable? ? (raw_data[value_prefix + [name.to_s]] || tracker.default_value) : nil
               values.push({ key: name.to_s, value: value })
             end
 
             evaluators.each do |name, evaluator|
-              value = evaluatable? ? (raw_data[value_prefix+[name.to_s]] || evaluator.default_value) : nil
+              value = evaluatable? ? (raw_data[value_prefix + [name.to_s]] || evaluator.default_value) : nil
               values.push({ key: name.to_s, value: value })
             end
           end
@@ -284,7 +286,14 @@ module ActiveReporter
         @prior_bin_report ||= if trackable? && trackers.any?
           first_bin_min = tracker_dimension.group_values.first.min
           prior_bin_params = {
-            dimensions: { tracker_dimension.name => { only: { min: (first_bin_min - tracker_dimension.bin_width), max: first_bin_min }}},
+            dimensions: {
+              tracker_dimension.name => {
+                only: {
+                  min: (first_bin_min - tracker_dimension.bin_width),
+                  max: first_bin_min
+                }
+              }
+            },
             trackers: nil
           }
           tracker_report_params = params.deep_merge(prior_bin_params)

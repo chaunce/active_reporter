@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/dimension/category"
 
 module ActiveReporter
@@ -14,11 +16,7 @@ module ActiveReporter
       end
 
       def filter(relation)
-        values = if Rails.gem_version >= Gem::Version.new("7")
-          filter_values.map { |value| enum_values[value] }.uniq
-        else
-          filter_values
-        end
+        values = filter_values.map { |value| enum_values[value] }.uniq
         query = case values
         when [] then "1=0"
         when [nil] then "#{expression} IS NULL"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Serializer
     class Highcharts < Table
@@ -22,91 +24,83 @@ module ActiveReporter
         color_hash[dimension.name][value]
       end
 
-      # def series
-      #   case report.groupers.count
-      #   when 2
-      #     dim1, dim2 = report.groupers
-      #     report.data.flat_map.with_index do |d2, i|
-      #       d2[:values].map do |d1|
-      #         {
-      #           stack: human_dimension_value_label(dim2, d2[:key]),
-      #           name: human_dimension_value_label(dim1, d1[:key]),
-      #           (i == 0 ? :id : :linkedTo) => human_dimension_value_label(dim1, d1[:key]),
-      #           color: color_for(dim1, d1[:key]),
-      #           data: d1[:values].map do |k,v|
-      #             {
-      #               y: v.to_f,
-      #               tooltip: tooltip_for(k => v, dim1 => d1),
-      #               filters: filters_for(k => v, dim1 => d1)
-      #             }
-      #           end
-      #         }
-      #       end
-      #     end
-      #   when 1
-      #     dim1 = report.groupers.first
-      #     report.data.map do |d1|
-      #       {
-      #         name: human_dimension_value_label(dim1, d1[:key]),
-      #         color: color_for(dim1, d1[:key]),
-      #         data: d1[:values].map do |k,v|
-      #           {
-      #             y: v.to_f,
-      #             tooltip: tooltip_for(k => v, dim1 => d1),
-      #             filters: filters_for(k => v, dim1 => d1)
-      #           }
-      #         end
-      #       }
-      #     end
-      #   else
-      #     raise ActiveReporter::InvalidParamsError, "report must have <= 2 groupers"
-      #   end
-      # end
-
       def series
         case report.groupers.count
         when 3
           dim1, dim2, dim3 = report.groupers
           report.data.flat_map.with_index do |d3, i|
-            d3[:values].map { |d2| {
-              stack: human_dimension_value_label(dim3, d3[:key]),
-              name: human_dimension_value_label(dim2, d2[:key]),
-              (i == 0 ? :id : :linkedTo) => human_dimension_value_label(dim2, d2[:key]),
-              color: color_for(dim2, d2[:key]),
-              data: d2[:values].map { |d1| {
-                y: d1[:value].to_f,
-                tooltip: tooltip_for(dim1 => d1, dim2 => d2, dim3 => d3),
-                filters: filters_for(dim1 => d1, dim2 => d2, dim3 => d3)
-              }}
-            }}
+            d3[:values].flat_map do |d2|
+              report.all_aggregators.keys.map do |aggregator|
+                name = series_name(human_dimension_value_label(dim2, d2[:key]), aggregator)
+                {
+                  stack: human_dimension_value_label(dim3, d3[:key]),
+                  name: name,
+                  (i == 0 ? :id : :linkedTo) => name,
+                  color: color_for(dim2, d2[:key]),
+                  data: d2[:values].map do |d1|
+                    {
+                      y: aggregator_value(d1, aggregator).to_f,
+                      tooltip: tooltip_for({ dim1 => d1, dim2 => d2, dim3 => d3 }, aggregator),
+                      filters: filters_for(dim1 => d1, dim2 => d2, dim3 => d3)
+                    }
+                  end
+                }
+              end
+            end
           end
         when 2
           dim1, dim2 = report.groupers
-          report.data.map { |d2| {
-            name: human_dimension_value_label(dim2, d2[:key]),
-            color: color_for(dim2, d2[:key]),
-            data: d2[:values].map { |d1| {
-              y: d1[:value].to_f,
-              tooltip: tooltip_for(dim1 => d1, dim2 => d2),
-              filters: filters_for(dim1 => d1, dim2 => d2)
-            }}
-          }}
+          report.data.flat_map do |d2|
+            report.all_aggregators.keys.map do |aggregator|
+              {
+                name: series_name(human_dimension_value_label(dim2, d2[:key]), aggregator),
+                color: color_for(dim2, d2[:key]),
+                data: d2[:values].map do |d1|
+                  {
+                    y: aggregator_value(d1, aggregator).to_f,
+                    tooltip: tooltip_for({ dim1 => d1, dim2 => d2 }, aggregator),
+                    filters: filters_for(dim1 => d1, dim2 => d2)
+                  }
+                end
+              }
+            end
+          end
         when 1
           dim1 = report.groupers.first
-          [{
-            name: human_aggregator_label(report.all_aggregators),
-            data: report.data.map { |d1| {
-              y: d1[:value].to_f,
-              tooltip: tooltip_for(dim1 => d1),
-              filters: filters_for(dim1 => d1)
-            }}
-          }]
+          report.all_aggregators.map do |aggregator, aggregator_axis|
+            {
+              name: human_aggregator_label(aggregator => aggregator_axis),
+              data: report.data.map do |d1|
+                {
+                  y: aggregator_value(d1, aggregator).to_f,
+                  tooltip: tooltip_for({ dim1 => d1 }, aggregator),
+                  filters: filters_for(dim1 => d1)
+                }
+              end
+            }
+          end
         else
           raise ActiveReporter::InvalidParamsError, "report must have <= 3 groupers"
         end
       end
 
-      def tooltip_for(xes)
+      # The leaf of report.data is { key: grouper_value, values: [{ key:
+      # aggregator, value: y }] }, so pull the requested aggregator's value out.
+      def aggregator_value(group, aggregator)
+        entry = Array(group[:values]).detect { |v| v[:key] == aggregator.to_s }
+        entry && entry[:value]
+      end
+
+      # When a chart plots more than one aggregator we emit a series per
+      # aggregator, so disambiguate the series name; for a single aggregator the
+      # name stays as just the grouper value (preserving the prior behavior).
+      def series_name(base, aggregator)
+        return base if report.all_aggregators.size <= 1
+
+        "#{base} (#{human_aggregator_label(aggregator => report.all_aggregators[aggregator])})"
+      end
+
+      def tooltip_for(xes, aggregator)
         lines = []
         xes.each do |dim, d|
           lines << [
@@ -115,8 +109,8 @@ module ActiveReporter
           ]
         end
         lines << [
-          human_aggregator_label(report.all_aggregators),
-          human_aggregator_value_label(report.all_aggregators, xes[report.groupers.first][:value])
+          human_aggregator_label(aggregator => report.all_aggregators[aggregator]),
+          human_aggregator_value_label({ aggregator => report.all_aggregators[aggregator] }, aggregator_value(xes[report.groupers.first], aggregator))
         ]
         lines.map { |k, v| "<b>#{k}:</b> #{v}" }.join("<br/>")
       end

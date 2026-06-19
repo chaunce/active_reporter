@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SiteController < ApplicationController
   def report
     @report = PostReport.new(params.fetch(:post_report, {}))

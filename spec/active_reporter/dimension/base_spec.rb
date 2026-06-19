@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ActiveReporter::Dimension::Base do
-  def new_dimension(dimension_params = {}, report_params = {}, opts = {})
+  def new_dimension(dimension_params = {}, report_params = {}, options = {})
     report_params[:dimensions] = { foo: dimension_params }
     ActiveReporter::Dimension::Base.new(
       :foo,
       OpenStruct.new(params: report_params),
-      opts
+      options
     )
   end
 
@@ -97,6 +99,32 @@ describe ActiveReporter::Dimension::Base do
     it "can be overridden" do
       dimension = new_dimension({}, {}, table_name: :baz, attribute: :bat)
       expect(dimension.expression).to eq "baz.bat"
+    end
+
+    it "uses a raw :expression option verbatim when given" do
+      dimension = new_dimension({}, {}, expression: "LOWER(posts.title)")
+      expect(dimension.expression).to eq "LOWER(posts.title)"
+    end
+  end
+
+  describe "abstract interface" do
+    it "raises NotImplementedError for #filter, #group, and #group_values" do
+      dimension = new_dimension
+
+      expect { dimension.filter(nil) }.to raise_error(NotImplementedError)
+      expect { dimension.group(nil) }.to raise_error(NotImplementedError)
+      expect { dimension.group_values }.to raise_error(NotImplementedError)
+    end
+  end
+
+  describe "#enum?" do
+    it "is false when the attribute is not a model enum" do
+      expect(new_dimension.send(:enum?)).to be false
+    end
+
+    it "is true when the attribute is a model enum" do
+      dimension = new_dimension({}, {}, model: :post, attribute: :status)
+      expect(dimension.send(:enum?)).to be true
     end
   end
 end

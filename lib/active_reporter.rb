@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   class << self
     def database_type
@@ -17,11 +19,7 @@ module ActiveReporter
     private
 
     def database_adapter
-      @database_adapter ||= if ActiveRecord.gem_version < Gem::Version.new("6.1")
-        ActiveRecord::Base.connection_config[:adapter]
-      else
-        ActiveRecord::Base.connection_db_config.adapter
-      end
+      @database_adapter ||= ActiveRecord::Base.connection_db_config.adapter
     end
   end
 end

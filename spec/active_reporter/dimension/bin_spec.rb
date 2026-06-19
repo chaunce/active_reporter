@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ActiveReporter::Dimension::Bin do
-  def new_dimension(dimension_params = {}, report_params = {}, opts = {})
+  def new_dimension(dimension_params = {}, report_params = {}, options = {})
     report_params[:dimensions] = { foo: dimension_params }
-    ActiveReporter::Dimension::Bin.new(:foo,
+    ActiveReporter::Dimension::Bin.new(
+      :foo,
       OpenStruct.new(params: report_params),
-      opts
+      options
     )
   end
 
@@ -25,12 +28,13 @@ describe ActiveReporter::Dimension::Bin do
   describe "#min/max" do
     it "finds the extremes in filter_values" do
       dimension = new_dimension(only: [{ min: 1, max: 3 }, { min: -3 }, { min: 17, max: 40 }])
-      expect(dimension.min).to eq -3
+      expect(dimension.min).to eq(-3)
       expect(dimension.max).to eq 40
     end
 
     it "falls back to the smallest value in the data" do
-      dimension = ActiveReporter::Dimension::Bin.new(:likes,
+      dimension = ActiveReporter::Dimension::Bin.new(
+        :likes,
         OpenStruct.new(records: Post, params: {}),
         model: :post, attribute: :likes
       )

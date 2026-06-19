@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ActiveReporter::Serializer::NestedHash do
@@ -20,7 +22,7 @@ describe ActiveReporter::Serializer::NestedHash do
     )
   end
 
-  let(:nested_hash_with_id) { ActiveReporter::Serializer::NestedHash.new(report) }
+  let(:nested_hash) { ActiveReporter::Serializer::NestedHash.new(report) }
   let!(:data_records) do
     [
       create(:post, created_at: "2016-01-01", likes: 2, title: "A"),
@@ -30,9 +32,9 @@ describe ActiveReporter::Serializer::NestedHash do
     ]
   end
 
-  describe "#report" do
-    it "builds report" do
-      expect(nested_hash_with_id.table).to eq({
+  describe "#table" do
+    it "nests aggregator values under each grouper value" do
+      expect(nested_hash.table).to eq({
         "A" => {
           "2016-01-01 00:00:00 UTC" => { post_count: "2", likes_count: "4" },
           "2016-01-02 00:00:00 UTC" => { post_count: "1", likes_count: "1" },

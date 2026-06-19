@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/inflector"
 require "active_reporter/dimension/bin"
 
@@ -6,7 +8,7 @@ module ActiveReporter
     class Time < Bin
       STEPS = %i(seconds minutes hours days weeks months years)
       BIN_STEPS = (STEPS - [:seconds]).map { |step| step.to_s.singularize(:_gem_active_reporter) }
-      DURATION_PATTERN = /\A\d+ (?:#{STEPS.map{ |step| "#{step}?" }.join("|")})\z/
+      DURATION_PATTERN = /\A\d+ (?:#{STEPS.map { |step| "#{step}?" }.join("|")})\z/
 
       def validate_params!
         super

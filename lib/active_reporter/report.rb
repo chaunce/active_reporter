@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Dir.glob(File.join(__dir__, "report", "*.rb")).each { |file| require file }
 
 module ActiveReporter
@@ -21,7 +23,7 @@ module ActiveReporter
       # aggregated "views" column, the child report can use Report::Calculator::Ratio to calculate the ratio of "views"
       # on a given row versus the total "views" from the parent report.
       @parent_report = @params.delete(:parent_report)
-      @parent_groupers = @params.delete(:parent_groupers) || ( grouper_names & Array(parent_report&.grouper_names) )
+      @parent_groupers = @params.delete(:parent_groupers) || (grouper_names & Array(parent_report&.grouper_names))
 
       # Supplements -> supplemental reports and data
       #
@@ -60,7 +62,7 @@ module ActiveReporter
       # Trackers calculate values using the current row data and prior row data.
 
       # If pre-compiled raw data was passed in, process all :calculators and :trackers now.
-      aggregate if @raw_data.present? && ( @params.include?(:calculators) || @params.include?(:trackers) )
+      aggregate if @raw_data.present? && (@params.include?(:calculators) || @params.include?(:trackers))
       total if @total_data.present?
     end
 
@@ -89,7 +91,7 @@ module ActiveReporter
       include_total_data = @params.include?(:total_data)
       total_data = @params.delete(:total_data) if include_total_data
 
-      DeeplyEnumerable::Hash.deep_compact(@params)
+      DeeplyEnumerable::Hash.deep_compact_blank(@params)
 
       # add raw report data back into params
       @params[:raw_data] = raw_data if include_raw_data

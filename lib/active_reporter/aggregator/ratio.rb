@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Aggregator
     class Ratio < ActiveReporter::Aggregator::Base
@@ -10,13 +12,15 @@ module ActiveReporter
       private
 
       def numerator
-        raise "Ratio aggregator must specify a numerator column" unless opts.include?(:numerator)
-        @numerator = report.aggregators[opts[:numerator].to_sym].try(:function) || "#{report.table_name}.#{opts[:numerator]}"
+        raise "Ratio aggregator must specify a numerator column" unless options.include?(:numerator)
+
+        @numerator = report.aggregators[options[:numerator].to_sym].try(:function) || "#{report.table_name}.#{options[:numerator]}"
       end
 
       def denominator
-        raise "Ratio aggregator must specify a denominator column" unless opts.include?(:denominator)
-        @denominator = report.aggregators[opts[:denominator].to_sym].try(:function) || "#{report.table_name}.#{opts[:denominator]}"
+        raise "Ratio aggregator must specify a denominator column" unless options.include?(:denominator)
+
+        @denominator = report.aggregators[options[:denominator].to_sym].try(:function) || "#{report.table_name}.#{options[:denominator]}"
       end
     end
   end

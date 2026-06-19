@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ActiveReporter::Dimension::Time do
-  def new_dimension(dimension_params = {}, report_params = {}, opts = {})
+  def new_dimension(dimension_params = {}, report_params = {}, options = {})
     report_params[:dimensions] = { foo: dimension_params }
     ActiveReporter::Dimension::Time.new(
       :foo,
       OpenStruct.new(params: report_params),
-      opts
+      options
     )
   end
 
@@ -50,12 +52,41 @@ describe ActiveReporter::Dimension::Time do
     end
 
     it "defaults to a sensical, standard duration" do
+      dimension = new_dimension(only: [{ min: "2015-01-01 00:00:00" }, { max: "2015-01-01 00:00:30" }])
+      expect(dimension.bin_width).to eq 1.second
+      dimension = new_dimension(only: [{ min: "2015-01-01 00:00:00" }, { max: "2015-01-01 01:00:00" }])
+      expect(dimension.bin_width).to eq 1.minute
       dimension = new_dimension(only: [{ min: "2015-01-01" }, { max: "2015-01-02" }])
       expect(dimension.bin_width).to eq 1.hour
       dimension = new_dimension(only: [{ min: "2015-01-01" }, { max: "2015-01-11" }])
       expect(dimension.bin_width).to eq 1.day
       dimension = new_dimension(only: [{ min: "2015-01-01" }, { max: "2015-02-11" }])
       expect(dimension.bin_width).to eq 1.week
+      dimension = new_dimension(only: [{ min: "2015-01-01" }, { max: "2016-01-01" }])
+      expect(dimension.bin_width).to eq 1.month
+      dimension = new_dimension(only: [{ min: "2015-01-01" }, { max: "2018-01-01" }])
+      expect(dimension.bin_width).to eq 1.year
+    end
+
+    it "treats a bare unit string as a width of one" do
+      expect(new_dimension(bin_width: "month").bin_width).to eq 1.month
+      expect(new_dimension(bin_width: "week").bin_width).to eq 1.week
+    end
+
+    it "defaults to one day when the domain is zero" do
+      expect(new_dimension(only: [{ min: "2015-01-01", max: "2015-01-01" }]).bin_width).to eq 1.day
+    end
+  end
+
+  describe ActiveReporter::Dimension::Time::Set do
+    let(:bin) { described_class.new("2015-01-01", "2015-02-01") }
+
+    it "casts values per database adapter" do
+      allow(ActiveReporter).to receive(:database_type).and_return(:sqlite)
+      expect(bin.cast(bin.min)).to match(/\ADATETIME\(/)
+
+      allow(ActiveReporter).to receive(:database_type).and_return(:mysql)
+      expect(bin.cast(bin.min)).to match(/\ACAST\(.* AS DATETIME\)\z/)
     end
   end
 end

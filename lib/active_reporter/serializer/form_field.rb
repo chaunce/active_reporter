@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Serializer
     class FormField < Base
@@ -12,11 +14,11 @@ module ActiveReporter
       end
 
       def aggregator_options
-        @agg_opts ||= report.all_aggregators.map { |name, agg| [human_aggregator_label(agg), name] }
+        @aggregator_options ||= report.all_aggregators.map { |name, agg| [human_aggregator_label(name => agg), name] }
       end
 
       def dimension_options
-        @dim_opts ||= report.dimensions.map { |name, dim| [human_dimension_label(dim), name] }
+        @dimension_options ||= report.dimensions.map { |name, dim| [human_dimension_label(dim), name] }
       end
 
       def aggregator_field
@@ -28,7 +30,7 @@ module ActiveReporter
       end
 
       def secondary_grouper_field
-        select_tag("#{prefix}[groupers][1]", options_for_select([[nil, nil]]+dimension_options, report.grouper_names[1]))
+        select_tag("#{prefix}[groupers][1]", options_for_select([[nil, nil]] + dimension_options, report.grouper_names[1]))
       end
 
       def axis_fields
@@ -47,7 +49,7 @@ module ActiveReporter
       def field_for(dimension)
         case dimension
         when ActiveReporter::Dimension::Category then category_dimension_field(dimension)
-        when ActiveReporter::Dimension::Set then bin_dimension_field(dimension)
+        when ActiveReporter::Dimension::Bin then bin_dimension_field(dimension)
         end
       end
 
@@ -126,8 +128,8 @@ module ActiveReporter
         "#{prefix}[dimensions][#{dimension.name}]"
       end
 
-      def css_class(s)
-        s.to_s.demodulize.underscore.dasherize
+      def css_class(name)
+        name.to_s.demodulize.underscore.dasherize
       end
     end
   end

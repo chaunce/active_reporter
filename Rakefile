@@ -20,4 +20,25 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+namespace :spec do
+  ADAPTERS = %w[postgres mysql sqlite].freeze
+
+  desc "Run the spec suite against every database adapter (#{ADAPTERS.join(", ")})"
+  task :all do
+    failed = []
+    ADAPTERS.each do |db|
+      puts "\n\e[1;34m== Running specs against #{db} ==\e[0m"
+      ok = system({ "DB" => db }, "bundle", "exec", "rspec")
+      failed << db unless ok
+    end
+
+    puts "\n\e[1m== Summary ==\e[0m"
+    ADAPTERS.each do |db|
+      status = failed.include?(db) ? "\e[31mFAILED\e[0m" : "\e[32mpassed\e[0m"
+      puts "  #{db}: #{status}"
+    end
+    abort "\nSpecs failed for: #{failed.join(", ")}" unless failed.empty?
+  end
+end
+
+task :default => "spec:all"

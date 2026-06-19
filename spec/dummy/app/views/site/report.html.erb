@@ -43,17 +43,17 @@
 <script>
 $(function() {
   /* most of the highcharts options come straight from the exporter */
-  window.chartOpts = <%= chart.highcharts_options.to_json.html_safe %>;
+  window.chartOptions = <%= chart.highcharts_options.to_json.html_safe %>;
 
   /* we merge in one additional option, which is the click event. we've set it up here
      to implement a drilldown feature */
-  chartOpts.tooltip.formatter = function() {
+  chartOptions.tooltip.formatter = function() {
     return this.point.tooltip + '<br>(click to drill down)';
   };
 
-  chartOpts.plotOptions.series.cursor = 'pointer';
+  chartOptions.plotOptions.series.cursor = 'pointer';
 
-  chartOpts.plotOptions.series.events.click = function(event) {
+  chartOptions.plotOptions.series.events.click = function(event) {
     Object.keys(event.point.filters).forEach(function(key) {
       var value = event.point.filters[key];
       if (value.min || value.max) {
@@ -68,6 +68,6 @@ $(function() {
   };
 
   /* actually invoke highcharts */
-  $('#report-chart').highcharts(chartOpts);
+  $('#report-chart').highcharts(chartOptions);
 });
 </script>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/inflector"
 require "active_reporter/invalid_params_error"
 
@@ -40,7 +42,7 @@ module ActiveReporter
         calculators.values.each do |calculator|
           case
           when calculator.aggregator.nil?
-            add_invalid_param_error(:calculator, ":#{calculator.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
+            add_invalid_param_error(:calculator, ":#{calculator.name} must define an aggregator (should be in #{self.class.aggregators.keys})")
           when self.class.aggregators.exclude?(calculator.aggregator)
             add_invalid_param_error(:calculator, ":#{calculator.name} defines an invalid aggregator :#{calculator.aggregator} (should be in #{self.class.aggregators.keys})")
           when params.include?(:aggregators) && aggregators.exclude?(calculator.aggregator)
@@ -57,14 +59,14 @@ module ActiveReporter
         trackers.values.each do |tracker|
           case
           when tracker.aggregator.nil?
-            add_invalid_param_error(:tracker, ":#{tracker.name} must define an aggregator (should be in #{self.class.aggregator.keys})")
+            add_invalid_param_error(:tracker, ":#{tracker.name} must define an aggregator (should be in #{self.class.aggregators.keys})")
           when self.class.aggregators.exclude?(tracker.aggregator)
             add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid aggregator :#{tracker.aggregator} (should be in #{self.class.aggregators.keys})")
           when params.include?(:aggregators) && aggregators.exclude?(tracker.aggregator)
             params[:aggregators].push(tracker.aggregator)
           end
 
-          if tracker.opts.include?(:prior_aggregator)
+          if tracker.options.include?(:prior_aggregator)
             case
             when self.class.aggregators.exclude?(tracker.prior_aggregator)
               add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid prior aggregator :#{tracker.prior_aggregator} (should be in #{self.class.aggregators.keys})")
@@ -77,7 +79,7 @@ module ActiveReporter
 
       def validate_groupers!
         unless groupers.all?(&:present?)
-          invalid_groupers = grouper_names.zip(groupers).collect { |k,v| k if v.nil? }.compact
+          invalid_groupers = grouper_names.zip(groupers).collect { |k, v| k if v.nil? }.compact
           invalid_groupers_message = [
             [
               invalid_groupers.to_sentence,

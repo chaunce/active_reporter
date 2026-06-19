@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "active_reporter/dimension/base"
 
 module ActiveReporter
@@ -28,6 +30,7 @@ module ActiveReporter
 
           loop do
             break if bin_edge >= max
+
             bin_edge += bin_width
           end
 
@@ -116,13 +119,16 @@ module ActiveReporter
       def autopopulate_bins
         return [] if bin_start.blank? || bin_end.blank?
 
-        bin_count = ((bin_end - bin_start)/(bin_width)).to_i
+        bin_count = ((bin_end - bin_start) / bin_width).to_i
         invalid_param!(:bin_width, "is too small for the domain; would generate #{bin_count.to_i} bins") if bin_count > max_bins
 
-        bins = bin_count.times.map { |i| { min: (bin_start + (bin_width*i)), max: (bin_start + (bin_width*i.next)) } }
+        bins = bin_count.times.map { |i| { min: (bin_start + (bin_width * i)), max: (bin_start + (bin_width * i.next)) } }
 
         bins.reverse! if sort_desc?
-        ( nulls_last? ? bins.push(nil) : bins.unshift(nil) ) if data_contains_nil?
+
+        if data_contains_nil?
+          nulls_last? ? bins.push(nil) : bins.unshift(nil)
+        end
 
         bins
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Aggregator
     class CountIf < ActiveReporter::Aggregator::Count
@@ -12,11 +14,11 @@ module ActiveReporter
       private
 
       def values
-        Array(opts[:values] || opts[:value] || true).compact
+        Array(options[:values] || options[:value] || true).compact
       end
 
       def column
-        super || "id"
+        super || :id
       end
     end
   end

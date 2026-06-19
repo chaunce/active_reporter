@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Dimension
     class Bin
@@ -115,7 +117,7 @@ module ActiveReporter
         alias key? has_key?
 
         def values_at(*keys)
-          keys.map { |k| self[key] }
+          keys.map { |k| self[k] }
         end
 
         def inspect

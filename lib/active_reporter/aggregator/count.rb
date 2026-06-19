@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Aggregator
     class Count < ActiveReporter::Aggregator::Base
@@ -12,11 +14,11 @@ module ActiveReporter
       private
 
       def distinct
-        opts[:distinct] || true
+        options.fetch(:distinct, true)
       end
 
       def column
-        opts.fetch(:column, "id")
+        options.fetch(:column, :id)
       end
     end
   end

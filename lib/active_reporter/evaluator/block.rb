@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Evaluator
     class Block < ActiveReporter::Evaluator::Base
@@ -8,7 +10,7 @@ module ActiveReporter
       private
 
       def block
-        opts.fetch(:block)
+        options.fetch(:block)
       end
     end
   end

@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require "active_reporter/aggregator/base"
 
 module ActiveReporter
   module Tracker
     class Base < ActiveReporter::Aggregator::Base
       def aggregator
-        opts[:aggregator] || name
+        options[:aggregator] || name
       end
 
       def prior_aggregator
-        opts[:prior_aggregator] || aggregator
+        options[:prior_aggregator] || aggregator
       end
     end
   end

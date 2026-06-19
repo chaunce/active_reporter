@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ActiveReporter::Serializer::HashTable do
@@ -31,8 +33,8 @@ describe ActiveReporter::Serializer::HashTable do
     create(:post, created_at: "2016-01-02", likes: 1, title: "A")
   end
 
-  describe "#report" do
-    it "builds report" do
+  describe "#table" do
+    it "builds a header row followed by one row of formatted values per group" do
       expect(hash_table.table).to eq [
         { title: "Title", created_at: "Created at", post_count: "Post count", likes_count: "Likes count" },
         { title: "A", created_at: "2016-01-01 00:00:00 UTC", post_count: "2", likes_count: "4" },

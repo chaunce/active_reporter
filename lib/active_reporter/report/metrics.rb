@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   class Report
     module Metrics
@@ -46,23 +48,25 @@ module ActiveReporter
       end
 
       def calculators
-        @calculators ||= build_axes(self.class.calculators.slice(*(Array(params[:calculators])+Array(params[:aggregators])).collect(&:to_sym).uniq))
+        @calculators ||= build_axes(self.class.calculators.slice(*(Array(params[:calculators]) + Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def trackers
-        @trackers ||= build_axes(self.class.trackers.slice(*(Array(params[:trackers])+Array(params[:aggregators])).collect(&:to_sym).uniq))
+        @trackers ||= build_axes(self.class.trackers.slice(*(Array(params[:trackers]) + Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def evaluators
-        @evaluators ||= build_axes(self.class.evaluators.slice(*(Array(params[:evaluators])+Array(params[:aggregators])).collect(&:to_sym).uniq))
+        @evaluators ||= build_axes(self.class.evaluators.slice(*(Array(params[:evaluators]) + Array(params[:aggregators])).collect(&:to_sym).uniq))
       end
 
       def all_aggregators
         aggregators.merge(calculators).merge(trackers).merge(evaluators)
       end
 
+      # The grouper dimensions followed by the calculator, tracker, and
+      # evaluator names that appear alongside them in report rows.
       def fields
-        [groupers, calculators.keys, trackers.keys, evaluators.keys].inject(&:merge)
+        [groupers, calculators.keys, trackers.keys, evaluators.keys].flatten
       end
 
       def total_report
@@ -72,7 +76,7 @@ module ActiveReporter
       private
 
       def build_axes(axes)
-        axes.map { |name, h| [name, h[:axis_class].new(name, self, h[:opts])] }.to_h
+        axes.map { |name, h| [name, h[:axis_class].new(name, self, h[:options])] }.to_h
       end
     end
   end

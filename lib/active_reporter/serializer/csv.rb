@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "csv"
 
 module ActiveReporter
@@ -11,7 +13,7 @@ module ActiveReporter
       end
 
       def save(filename = self.filename)
-        File.open(filename, "w") { |f| f.write data }
+        File.open(filename, "w") { |f| f.write csv_text }
       end
 
       def filename

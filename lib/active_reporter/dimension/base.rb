@@ -1,35 +1,38 @@
+# frozen_string_literal: true
+
 module ActiveReporter
   module Dimension
     class Base
-      attr_reader :name, :report, :opts
+      attr_reader :name, :report, :options
 
-      def initialize(name, report, opts={})
+      def initialize(name, report, options = {})
         @name = name
         @report = report
-        @opts = opts
+        @options = options
         validate_params!
       end
 
       def model
-        return @model unless @model.nil?
-
-        @model = opts[:model].to_s.classify.constantize rescue opts[:model]
-        @model = report.report_model if @model.nil?
-
-        @model
+        @model ||= options[:model].to_s.classify.safe_constantize || options[:model] || report.report_model
       end
 
       def attribute
-        opts.fetch(:attribute, name)
+        options.fetch(:attribute, name)
       end
 
       def expression
-        @expression ||= opts[:expression] || opts[:_expression] || "#{table_name}.#{column}"
+        @expression ||= if options.include?(:expression)
+          options[:expression]
+        elsif options.include?(:_alias)
+          "'#{options[:_alias]}'"
+        else
+          "#{table_name}.#{column}"
+        end
       end
 
       # Do any joins/selects necessary to filter or group the relation.
       def relate(relation)
-        opts.fetch(:relation, ->(r) { r }).call(relation)
+        options.fetch(:relation, ->(r) { r }).call(relation)
       end
 
       # Filter the relation based on any constraints in the params
@@ -90,6 +93,7 @@ module ActiveReporter
 
       def null_order
         return unless ActiveReporter.database_type == :postgres
+
         nulls_last? ? "NULLS LAST" : "NULLS FIRST"
       end
 
@@ -99,10 +103,9 @@ module ActiveReporter
 
       private
 
+      # Validation hook run on initialize; subclasses (Bin/Number/Time) override
+      # this and `super` into it to validate their dimension params.
       def validate_params!
-        if opts.include?(:expression)
-          ActiveSupport::Deprecation.warn("passing an :expression option will be deprecated in version 1.0\n  please use :attribute, and, when required, :model or :table_name")
-        end
       end
 
       def invalid_param!(param_key, message)
@@ -110,18 +113,11 @@ module ActiveReporter
       end
 
       def table_name
-        return @table_name unless @table_name.nil?
-
-        @table_name = opts[:table_name]
-        @table_name = model.try(:table_name) if @table_name.nil?
-        @table_name = model.to_s.constantize.try(:table_name) rescue nil if @table_name.nil?
-        @table_name = report.table_name if @table_name.nil?
-
-        @table_name
+        @table_name ||= options[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
       end
 
       def column
-        opts.fetch(:column, attribute)
+        options.fetch(:column, attribute)
       end
 
       def sql_value_name
@@ -139,11 +135,12 @@ module ActiveReporter
       def array_param(key)
         return [] unless params.key?(key)
         return [nil] if params[key].nil?
+
         Array.wrap(params[key])
       end
 
       def enum?
-        false # Hash(model&.defined_enums).include?(attribute.to_s)
+        Hash(model&.defined_enums).include?(attribute.to_s)
       end
     end
   end
