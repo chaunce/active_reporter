@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description = "Flexible but opinionated framework for defining and running reports on Rails models backed by SQL databases."
   spec.license     = "MIT"
 
-  spec.metadata = { rubygems_mfa_required: "true" }
+  spec.metadata = { "rubygems_mfa_required" => "true" }
   spec.required_ruby_version = ">= 3.3"
 
   spec.files = Dir["lib/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
