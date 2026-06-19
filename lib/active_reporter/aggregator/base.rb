@@ -56,7 +56,7 @@ module ActiveReporter
       end
 
       def expression
-        "#{table_name}.#{column}"
+        options[:expression] || "#{table_name}.#{column}"
       end
 
       def enum?

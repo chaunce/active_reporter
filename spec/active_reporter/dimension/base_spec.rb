@@ -100,6 +100,11 @@ describe ActiveReporter::Dimension::Base do
       dimension = new_dimension({}, {}, table_name: :baz, attribute: :bat)
       expect(dimension.expression).to eq "baz.bat"
     end
+
+    it "uses a raw :expression option verbatim when given" do
+      dimension = new_dimension({}, {}, expression: "LOWER(posts.title)")
+      expect(dimension.expression).to eq "LOWER(posts.title)"
+    end
   end
 
   describe "abstract interface" do

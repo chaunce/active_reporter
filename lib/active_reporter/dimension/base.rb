@@ -21,7 +21,13 @@ module ActiveReporter
       end
 
       def expression
-        @expression ||= options.include?(:_alias) ? "'#{options[:_alias]}'" : "#{table_name}.#{column}"
+        @expression ||= if options.include?(:expression)
+          options[:expression]
+        elsif options.include?(:_alias)
+          "'#{options[:_alias]}'"
+        else
+          "#{table_name}.#{column}"
+        end
       end
 
       # Do any joins/selects necessary to filter or group the relation.
