@@ -6,7 +6,7 @@ especially breaking changes, while the work is in progress.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
-## 1.0.0 (unreleased)
+## 1.0.1
 
 ### ⚠️ Breaking changes
 
