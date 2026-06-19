@@ -3,30 +3,30 @@
 module ActiveReporter
   module Dimension
     class Base
-      attr_reader :name, :report, :opts
+      attr_reader :name, :report, :options
 
-      def initialize(name, report, opts={})
+      def initialize(name, report, options={})
         @name = name
         @report = report
-        @opts = opts
+        @options = options
         validate_params!
       end
 
       def model
-        @model ||= opts[:model].to_s.classify.safe_constantize || opts[:model] || report.report_model
+        @model ||= options[:model].to_s.classify.safe_constantize || options[:model] || report.report_model
       end
 
       def attribute
-        opts.fetch(:attribute, name)
+        options.fetch(:attribute, name)
       end
 
       def expression
-        @expression ||= opts.include?(:_alias) ? "'#{opts[:_alias]}'" : "#{table_name}.#{column}"
+        @expression ||= options.include?(:_alias) ? "'#{options[:_alias]}'" : "#{table_name}.#{column}"
       end
 
       # Do any joins/selects necessary to filter or group the relation.
       def relate(relation)
-        opts.fetch(:relation, ->(r) { r }).call(relation)
+        options.fetch(:relation, ->(r) { r }).call(relation)
       end
 
       # Filter the relation based on any constraints in the params
@@ -106,11 +106,11 @@ module ActiveReporter
       end
 
       def table_name
-        @table_name ||= opts[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
+        @table_name ||= options[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
       end
 
       def column
-        opts.fetch(:column, attribute)
+        options.fetch(:column, attribute)
       end
 
       def sql_value_name

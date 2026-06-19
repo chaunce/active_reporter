@@ -28,12 +28,12 @@ module ActiveReporter
         # Bin dimensions group many rows into "bins" of a specified width, this is helpful when grouping by a datetime
         # value by allowing you to set this bin width to :days or :months. In addition to the Time dimension you can
         # use the Number dimensions with a bin, grouping numeric values into larger groups such as 10s or 100s.
-        def dimension(name, dimension_class, opts = {})
-          dimensions[name.to_sym] = { axis_class: dimension_class, opts: opts }
+        def dimension(name, dimension_class, options = {})
+          dimensions[name.to_sym] = { axis_class: dimension_class, options: options }
         end
 
         def dimensions
-          @dimensions ||= { totals: { axis_class: Dimension::Category, opts: { _alias: :totals } } }
+          @dimensions ||= { totals: { axis_class: Dimension::Category, options: { _alias: :totals } } }
         end
 
         # Aggregators calculate the statistical data for the report into each dimension group. After grouping the data
@@ -47,8 +47,8 @@ module ActiveReporter
         # Sum aggregator would calculate the sum total of all values across all the data in the group.
         #
         # Additional aggregators are also available for many other calculation types
-        def aggregator(name, aggregator_class, opts = {})
-          aggregators[name.to_sym] = { axis_class: aggregator_class, opts: opts }
+        def aggregator(name, aggregator_class, options = {})
+          aggregators[name.to_sym] = { axis_class: aggregator_class, options: options }
         end
 
         def aggregators
@@ -69,10 +69,10 @@ module ActiveReporter
         # Author's total Likes.
         #
         # A calculator only performs additional calculations on already aggregated data, so an :aggregator value
-        # matching the aggregator name must be passed in the opts. Additionally, you may optionally pass a
+        # matching the aggregator name must be passed in the options. Additionally, you may optionally pass a
         # :parent_aggregator if the name of this aggregator is different.
-        def calculator(name, calculator_class, opts = {})
-          calculators[name.to_sym] = { axis_class: calculator_class, opts: opts }
+        def calculator(name, calculator_class, options = {})
+          calculators[name.to_sym] = { axis_class: calculator_class, options: options }
         end
 
         def calculators
@@ -93,9 +93,9 @@ module ActiveReporter
         # be calculated, even if the Published date on the row is sequentially immediately adjacent.
         #
         # A tracker only performs additional calculations on already aggregated data, so an :aggregator value matching
-        # the aggregator name must be passed in the opts.
-        def tracker(name, tracker_class, opts = {})
-          trackers[name.to_sym] = { axis_class: tracker_class, opts: opts }
+        # the aggregator name must be passed in the options.
+        def tracker(name, tracker_class, options = {})
+          trackers[name.to_sym] = { axis_class: tracker_class, options: options }
         end
 
         def trackers
@@ -103,9 +103,9 @@ module ActiveReporter
         end
 
         # block_evaluator(:chargeback_ratio) { |row| supplemental_report_data.detect { |data| data[:id] == row[:id] }[:count] / row[:count] }
-        def evaluator(name, evaluator_class, opts = {})
-          raise "needs block" unless opts.include?(:block)
-          evaluators[name.to_sym] = { axis_class: evaluator_class, opts: opts }
+        def evaluator(name, evaluator_class, options = {})
+          raise "needs block" unless options.include?(:block)
+          evaluators[name.to_sym] = { axis_class: evaluator_class, options: options }
         end
 
         def evaluators
@@ -124,9 +124,9 @@ module ActiveReporter
         METRICS.each do |type, metrics|
           metrics.each do |metric|
             class_eval <<-METRIC_HELPERS, __FILE__, __LINE__ + 1
-              def #{metric}_#{type}(name, opts = {}, &block)
-                opts[:block] = block if block_given?
-                #{type}(name, #{(type.to_s + "/" + metric.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
+              def #{metric}_#{type}(name, options = {}, &block)
+                options[:block] = block if block_given?
+                #{type}(name, #{(type.to_s + "/" + metric.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, options)
               end
             METRIC_HELPERS
           end

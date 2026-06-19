@@ -10,7 +10,7 @@ module ActiveReporter
       private
 
       def block
-        opts.fetch(:block)
+        options.fetch(:block)
       end
     end
   end

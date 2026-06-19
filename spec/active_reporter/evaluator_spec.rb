@@ -6,16 +6,16 @@ describe ActiveReporter::Evaluator::Base do
   let(:report) { double("report") }
 
   describe "#initialize" do
-    it "stores the name, report, and opts" do
+    it "stores the name, report, and options" do
       evaluator = described_class.new(:my_evaluator, report, foo: "bar")
 
       expect(evaluator.name).to eq :my_evaluator
       expect(evaluator.report).to eq report
-      expect(evaluator.opts).to eq(foo: "bar")
+      expect(evaluator.options).to eq(foo: "bar")
     end
 
-    it "defaults opts to an empty hash" do
-      expect(described_class.new(:my_evaluator, report).opts).to eq({})
+    it "defaults options to an empty hash" do
+      expect(described_class.new(:my_evaluator, report).options).to eq({})
     end
   end
 

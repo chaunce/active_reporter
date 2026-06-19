@@ -3,12 +3,12 @@
 module ActiveReporter
   module Aggregator
     class Base
-      attr_reader :name, :report, :opts
+      attr_reader :name, :report, :options
 
-      def initialize(name, report, opts={})
+      def initialize(name, report, options={})
         @name = name
         @report = report
-        @opts = opts
+        @options = options
         validate_params!
       end
 
@@ -17,7 +17,7 @@ module ActiveReporter
       end
 
       def default_value
-        opts.fetch(:default_value, nil)
+        options.fetch(:default_value, nil)
       end
 
       def aggregate(groups)
@@ -36,23 +36,23 @@ module ActiveReporter
       end
 
       def relation
-        opts.fetch(:relation, ->(r) { r })
+        options.fetch(:relation, ->(r) { r })
       end
 
       def model
-        opts.fetch(:model, report.report_model)
+        options.fetch(:model, report.report_model)
       end
 
       def attribute
-        opts.fetch(:attribute, name)
+        options.fetch(:attribute, name)
       end
 
       def table_name
-        @table_name ||= opts[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
+        @table_name ||= options[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
       end
 
       def column
-        opts.fetch(:column, attribute)
+        options.fetch(:column, attribute)
       end
 
       def expression

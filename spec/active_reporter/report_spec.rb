@@ -769,7 +769,7 @@ describe ActiveReporter::Report do
     end
 
     it "flags a tracker that is unknown or missing an aggregator" do
-      tracker = double("tracker", name: :bogus, aggregator: nil, opts: {})
+      tracker = double("tracker", name: :bogus, aggregator: nil, options: {})
       allow(report).to receive(:trackers).and_return(bogus: tracker)
 
       report.validate_trackers!

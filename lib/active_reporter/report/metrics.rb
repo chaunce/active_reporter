@@ -76,7 +76,7 @@ module ActiveReporter
       private
 
       def build_axes(axes)
-        axes.map { |name, h| [name, h[:axis_class].new(name, self, h[:opts])] }.to_h
+        axes.map { |name, h| [name, h[:axis_class].new(name, self, h[:options])] }.to_h
       end
     end
   end

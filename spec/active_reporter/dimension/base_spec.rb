@@ -3,12 +3,12 @@
 require "spec_helper"
 
 describe ActiveReporter::Dimension::Base do
-  def new_dimension(dimension_params = {}, report_params = {}, opts = {})
+  def new_dimension(dimension_params = {}, report_params = {}, options = {})
     report_params[:dimensions] = { foo: dimension_params }
     ActiveReporter::Dimension::Base.new(
       :foo,
       OpenStruct.new(params: report_params),
-      opts
+      options
     )
   end
 

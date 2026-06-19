@@ -124,7 +124,10 @@ module ActiveReporter
         bins = bin_count.times.map { |i| { min: (bin_start + (bin_width*i)), max: (bin_start + (bin_width*i.next)) } }
 
         bins.reverse! if sort_desc?
-        ( nulls_last? ? bins.push(nil) : bins.unshift(nil) ) if data_contains_nil?
+
+        if data_contains_nil?
+          nulls_last? ? bins.push(nil) : bins.unshift(nil)
+        end
 
         bins
       end

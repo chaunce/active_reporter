@@ -66,7 +66,7 @@ module ActiveReporter
             params[:aggregators].push(tracker.aggregator)
           end
 
-          if tracker.opts.include?(:prior_aggregator)
+          if tracker.options.include?(:prior_aggregator)
             case
             when self.class.aggregators.exclude?(tracker.prior_aggregator)
               add_invalid_param_error(:tracker, ":#{tracker.name} defines an invalid prior aggregator :#{tracker.prior_aggregator} (should be in #{self.class.aggregators.keys})")

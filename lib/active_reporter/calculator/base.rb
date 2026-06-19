@@ -6,15 +6,15 @@ module ActiveReporter
   module Calculator
     class Base < ActiveReporter::Aggregator::Base
       def aggregator
-        opts[:aggregator] || name
+        options[:aggregator] || name
       end
 
       def parent_aggregator
-        opts[:parent_aggregator] || aggregator
+        options[:parent_aggregator] || aggregator
       end
 
       def totals?
-        !!opts[:totals]
+        !!options[:totals]
       end
     end
   end

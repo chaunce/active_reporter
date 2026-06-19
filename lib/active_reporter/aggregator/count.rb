@@ -14,11 +14,11 @@ module ActiveReporter
       private
 
       def distinct
-        opts.fetch(:distinct, true)
+        options.fetch(:distinct, true)
       end
 
       def column
-        opts.fetch(:column, "id")
+        options.fetch(:column, :id)
       end
     end
   end
