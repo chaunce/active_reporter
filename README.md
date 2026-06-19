@@ -7,11 +7,12 @@
 enough to accommodate many use cases, but opinionated enough to avoid the need
 for boilerplate.
 
+Requires Ruby >= 3.3 and Rails 7.1–8.x. Upgrading from a pre-1.0 release? See
+[Upgrading to v1](#upgrading-to-v1).
+
 `ActiveReporter` is based on the `repor` gem by Andrew Ross https://github.com/asross/repor
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
+## Contents
 
 - [Basic usage](#basic-usage)
 - [Building reports](#building-reports)
@@ -24,10 +25,9 @@ for boilerplate.
   - [Aggregators (y-axes)](#aggregators-y-axes)
     - [Customizing aggregators](#customizing-aggregators)
 - [Serializing reports](#serializing-reports)
+- [Upgrading to v1](#upgrading-to-v1)
 - [Contributing](#contributing)
 - [License](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Basic usage
 
@@ -196,6 +196,12 @@ PostReport.new.dimensions[:author].expression
 # => 'users.name'
 ```
 
+`autoreport_on` maps each column to a dimension type: `enum` columns become
+`Enum` dimensions, boolean columns become `Boolean`, date/time columns become
+`Time`, numeric columns become `Number`, `belongs_to` associations become a
+joined `Category` on the association's name column, and everything else becomes
+`Category`.
+
 Autoreport behavior can be customized by overriding certain methods; see the
 `ActiveReporter::Report` code for more information.
 
@@ -208,6 +214,12 @@ by a SQL expression, and accept/return simple Ruby values of various types.
 There are several built-in types of dimensions:
 - `Category`
     - Groups/filters the relation by the discrete values of the `expression`
+- `Enum`
+    - Like `Category`, but for Rails `enum` columns: filters/groups by the enum
+      name while mapping to and from the underlying stored value
+- `Boolean`
+    - Like `Category`, but for boolean columns: casts filter values to real
+      booleans and normalizes grouped values to `true`/`false`/`nil` across adapters
 - `Number`
     - Groups/filters the relation by binning a continuous numeric `expression`
 - `Time`
@@ -224,14 +236,28 @@ class PostReport < ActiveReporter::Report
 end
 ```
 
-The SQL expression a dimension uses defaults to:
+The SQL expression a dimension uses defaults to
+`"#{report.table_name}.#{dimension.name}"`. For a plain column, point it
+elsewhere with `attribute:` (a different column), and `model:` or `table_name:`
+(a different table):
+
 ```ruby
-"#{report.table_name}.#{dimension.name}"
+category_dimension :author, attribute: :name, model: :user,
+  relation: ->(r) { r.joins(:author) }
 ```
 
-but this can be overridden by passing an `expression` option. Additionally, if
-the filtering or grouping requires joins or other SQL operations, a custom
-`relation` proc can be passed, which will be called beforehand.
+For anything that isn't a simple `table.column` reference — SQL functions,
+`CASE` expressions, arithmetic across columns — pass a raw `expression:`
+instead (it is used verbatim):
+
+```ruby
+category_dimension :author, expression: "users.name",
+  relation: ->(r) { r.joins(:author) }
+```
+
+Additionally, if the filtering or grouping requires joins or other SQL
+operations, a custom `relation` proc can be passed, which will be called
+beforehand.
 
 #### Filtering by dimensions
 
@@ -349,6 +375,18 @@ There are several built-in types of aggregators:
 - `Aggregator::Array`
     - returns an array of `expression` values in each group (PostgreSQL only)
     - useful if you want to drill down into the data behind an aggregation
+- `Aggregator::CountIf`
+    - counts records matching a SQL condition; pass the condition as `expression:`
+      and the value(s) to match as `value:`/`values:`
+- `Aggregator::Ratio`
+    - divides a `numerator` aggregate by a `denominator` aggregate (PostgreSQL only)
+
+In addition to aggregators, reports support **calculators** (compute values
+against a `parent_report`, e.g. a ratio of a row to its parent total),
+**trackers** (compute values between sequential bin rows, e.g. a period-over-period
+delta), and **evaluators** (`block_evaluator` runs an arbitrary Ruby block per
+row). See the `lib/active_reporter/{calculator,tracker,evaluator}` classes for
+details.
 
 #### Customizing aggregators
 
@@ -404,25 +442,68 @@ get up and running.
 
 See the serializer class files for more documentation.
 
+## Upgrading to v1
+
+v1 modernizes the gem for current Ruby/Rails and fixes a number of latent bugs.
+See the [CHANGELOG](CHANGELOG.md) for the full list. The points below are the
+only ones that may require action.
+
+### Required changes
+
+- **Ruby >= 3.3 and Rails 7.1–8.x.** `required_ruby_version` is now `>= 3.3`.
+- **If you subclass a dimension/aggregator or read the registration hash**, the
+  options accessor was renamed `opts` → `options`:
+  ```ruby
+  # before
+  dimension.opts            report_model.dimensions[:author][:opts]
+  # after
+  dimension.options         report_model.dimensions[:author][:options]
+  ```
+- **If you pin `deeply_enumerable`**, it is now `~> 2.0` (was `< 2.0`).
+
+`:expression`, `:attribute`, `:model`, and `:table_name` are unchanged — existing
+dimension/aggregator definitions keep working. (`:attribute`/`:model`/`:table_name`
+are the convenient way to target a column; `:expression` remains the escape hatch
+for raw/computed SQL.)
+
+### Behavior changes to be aware of
+
+These need no code changes, but the output may differ:
+
+- **`autoreport_on`** now maps `enum` columns to `Dimension::Enum` and boolean
+  columns to `Dimension::Boolean` (previously `Number`/`Category`).
+- **`Serializer::Highcharts#series`** now emits one series per aggregator with
+  correctly-populated `y` values (previously a single series with `y: 0.0`). If
+  you consume the series structure directly, re-check it. (`#tooltip_for` also
+  takes the aggregator as a second argument now.)
+- **`Report#params`** now strips blank values (empty strings, empty
+  arrays/hashes), not just `nil`s.
+- **`Tracker::Value`** now returns the prior period's value (it was previously
+  non-functional).
+
+Everything else in the CHANGELOG's "Fixed" section is an internal bug fix that
+requires no action on your part.
+
 ## Contributing
 
 If you have suggestions for how to make any part of this library better, or if
 you want to contribute extra dimensions, aggregators, serializers, please
 submit them in a pull request (with test coverage).
 
-To work on developing `ActiveReporter`, you will need to have Ruby and PostgreSQL,
-MySQL, or SQLite3 installed. Then clone the repository and run:
+To work on developing `ActiveReporter`, you will need Ruby (>= 3.3) and
+PostgreSQL, MySQL, or SQLite3 installed. Then clone the repository and run:
 ```sh
 bundle install
-cd spec/dummy
-DB=<your db type> bundle exec rake db:create db:schema:load db:test:prepare
-cd ../..
+
+# run against one adapter (the test database is created and loaded automatically):
 DB=<your db type> bundle exec rspec
+
+# or run against all three adapters at once:
+bundle exec rake spec:all
 ```
 
-which will run the test suite. The options for `DB` are `sqlite`, `mysql`, and
-`postgres` (the default). Preferably you should run it against all three, but
-CI will also do so.
+The options for `DB` are `sqlite`, `mysql`, and `postgres` (the default).
+Preferably you should run against all three, as CI does.
 
 To see the dummy application in development mode, you can run:
 ```sh
