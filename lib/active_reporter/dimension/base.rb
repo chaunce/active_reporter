@@ -13,12 +13,7 @@ module ActiveReporter
       end
 
       def model
-        return @model unless @model.nil?
-
-        @model = opts[:model].to_s.classify.constantize rescue opts[:model]
-        @model = report.report_model if @model.nil?
-
-        @model
+        @model ||= opts[:model].to_s.classify.safe_constantize || opts[:model] || report.report_model
       end
 
       def attribute
