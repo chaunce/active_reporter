@@ -17,12 +17,16 @@ describe ActiveReporter::Aggregator do
 
   let(:report) { report_model.new(aggregators: aggregators, groupers: [:author, :status]) }
 
-  let!(:post_1) { create(:post, likes: 3, author: "Alice") }
-  let!(:post_2) { create(:post, likes: 2, author: "Alice") }
-  let!(:post_3) { create(:post, likes: 4, author: "Bob") }
-  let!(:post_4) { create(:post, likes: 1, author: "Bob") }
-  let!(:post_5) { create(:post, likes: 5, author: "Bob") }
-  let!(:post_6) { create(:post, likes: 10, author: "Chester") }
+  let(:author_alice) { create(:author, name: "Alice") }
+  let(:author_bob) { create(:author, name: "Bob") }
+  let(:author_chester) { create(:author, name: "Chester") }
+
+  let!(:post_alice_3) { create(:post, likes: 3, author: author_alice) }
+  let!(:post_alice_2) { create(:post, likes: 2, author: author_alice) }
+  let!(:post_bob_4) { create(:post, likes: 4, author: author_bob) }
+  let!(:post_bob_1) { create(:post, likes: 1, author: author_bob) }
+  let!(:post_bob_5) { create(:post, likes: 5, author: author_bob) }
+  let!(:post_chester_10) { create(:post, likes: 10, author: author_chester) }
 
   context "aggregating post_ids" do
     let(:aggregators) { :post_ids }
@@ -30,9 +34,9 @@ describe ActiveReporter::Aggregator do
     it "should return post_ids values" do
       if ActiveReporter.database_type == :postgres
         expect(report.raw_data).to eq({
-          ["Alice", "published", "post_ids"] => [post_1.id, post_2.id],
-          ["Bob", "published", "post_ids"] => [post_3.id, post_4.id, post_5.id],
-          ["Chester", "published", "post_ids"] => [post_6.id],
+          ["Alice", "published", "post_ids"] => [post_alice_3.id, post_alice_2.id],
+          ["Bob", "published", "post_ids"] => [post_bob_4.id, post_bob_1.id, post_bob_5.id],
+          ["Chester", "published", "post_ids"] => [post_chester_10.id],
         })
       else
         expect { report.raw_data }.to raise_error(ActiveReporter::InvalidParamsError)

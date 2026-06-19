@@ -7,37 +7,43 @@ describe ActiveReporter::Dimension::Category do
   end
 
   describe "#filter" do
+    let(:author_alice) { create(:author, name: "Alice") }
+    let(:author_bob) { create(:author, name: "Bob") }
+
+    let!(:post_by_alice) { create(:post, author: author_alice) }
+    let!(:post_by_bob) { create(:post, author: author_bob) }
+    let!(:post_without_author) { create(:post, author: nil) }
+
+    def filter_by(author_values)
+      report = OpenStruct.new(
+        table_name: "posts",
+        params: { dimensions: { author: { only: author_values } } }
+      )
+      dimension = author_dimension(report)
+      dimension.filter(dimension.relate(Post))
+    end
+
     it "filters to rows matching at least one value" do
-      p1 = create(:post, author: "Alice")
-      p2 = create(:post, author: "Bob")
-      p3 = create(:post, author: nil)
-
-      def filter_by(author_values)
-        report = OpenStruct.new(
-          table_name: "posts",
-          params: { dimensions: { author: { only: author_values } } }
-        )
-        dimension = author_dimension(report)
-        dimension.filter(dimension.relate(Post))
-      end
-
-      expect(filter_by(["Alice"])).to eq [p1]
-      expect(filter_by([nil])).to eq [p3]
-      expect(filter_by(["Alice", nil])).to eq [p1, p3]
-      expect(filter_by(["Alice", "Bob"])).to eq [p1, p2]
+      expect(filter_by([author_alice.name])).to eq [post_by_alice]
+      expect(filter_by([nil])).to eq [post_without_author]
+      expect(filter_by([author_alice.name, nil])).to eq [post_by_alice, post_without_author]
+      expect(filter_by([author_alice.name, author_bob.name])).to eq [post_by_alice, post_by_bob]
       expect(filter_by([])).to eq []
     end
   end
 
   describe "#group" do
-    it "groups the relation by the exact value of the SQL expression" do
-      p1 = create(:post, author: "Alice")
-      p2 = create(:post, author: "Alice")
-      p3 = create(:post, author: nil)
-      p4 = create(:post, author: "Bob")
-      p5 = create(:post, author: "Bob")
-      p6 = create(:post, author: "Bob")
+    let(:author_alice) { create(:author, name: "Alice") }
+    let(:author_bob) { create(:author, name: "Bob") }
 
+    let!(:post_alice_1) { create(:post, author: author_alice) }
+    let!(:post_alice_2) { create(:post, author: author_alice) }
+    let!(:post_without_author) { create(:post, author: nil) }
+    let!(:post_bob_1) { create(:post, author: author_bob) }
+    let!(:post_bob_2) { create(:post, author: author_bob) }
+    let!(:post_bob_3) { create(:post, author: author_bob) }
+
+    it "groups the relation by the exact value of the SQL expression" do
       report = OpenStruct.new(table_name: "posts", params: {})
       dimension = author_dimension(report)
 
@@ -45,7 +51,7 @@ describe ActiveReporter::Dimension::Category do
         r.attributes.values_at(dimension.send(:sql_value_name), "count")
       end
 
-      expect(results).to eq [[nil, 1], ["Alice", 2], ["Bob", 3]]
+      expect(results).to eq [[nil, 1], [author_alice.name, 2], [author_bob.name, 3]]
     end
   end
 

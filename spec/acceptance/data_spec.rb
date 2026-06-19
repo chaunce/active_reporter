@@ -41,19 +41,19 @@ describe "more complicated case" do
   let(:oct) { { min: oct_1, max: nov_1 } }
   let(:nov) { { min: nov_1, max: dec_1 } }
 
-  let!(:post_1) { create(:post, author: joyce.name, published_at: oct_1, likes: 1) }
-  let!(:post_2) { create(:post, author: joyce.name, published_at: oct_1, likes: 2) }
-  let!(:post_3) { create(:post, author: joyce.name, published_at: nov_1, likes: 1) }
-  let!(:post_4) { create(:post, author: joyce.name, likes: 3).tap { |p| p.update!(published_at: nil) } }
+  let!(:post_1) { create(:post, author: joyce, published_at: oct_1, likes: 1) }
+  let!(:post_2) { create(:post, author: joyce, published_at: oct_1, likes: 2) }
+  let!(:post_3) { create(:post, author: joyce, published_at: nov_1, likes: 1) }
+  let!(:post_4) { create(:post, author: joyce, likes: 3).tap { |p| p.update!(published_at: nil) } }
 
-  let!(:post_5) { create(:post, author: woolf.name, published_at: oct_1, likes: 2) }
-  let!(:post_6) { create(:post, author: woolf.name, published_at: nov_1, likes: 3) }
-  let!(:post_7) { create(:post, author: woolf.name, likes: 3).tap { |p| p.update!(published_at: nil) } }
+  let!(:post_5) { create(:post, author: woolf, published_at: oct_1, likes: 2) }
+  let!(:post_6) { create(:post, author: woolf, published_at: nov_1, likes: 3) }
+  let!(:post_7) { create(:post, author: woolf, likes: 3).tap { |p| p.update!(published_at: nil) } }
 
   let!(:post_8) { create(:post, author: nil, published_at: oct_1, likes: 2) }
   let!(:post_9) { create(:post, author: nil, published_at: nov_1, likes: 3) }
 
-  specify "basic grouping, 1 grouper, no filters" do
+  it "basic grouping, 1 grouper, no filters" do
     expect(data_by(:author)).to match_report_data([
       { key: nil, values: [
         { key: :count, value: 2 },
@@ -127,7 +127,7 @@ describe "more complicated case" do
     ])
   end
 
-  specify "basic grouping, >=2 groupers, no filters" do
+  it "basic grouping, >=2 groupers, no filters" do
     expect(data_by([:published_at, :author], bin_width: { months: 1 })).to match_report_data([
       { key: nil, values: [
         { key: nil,  values: [
@@ -201,7 +201,7 @@ describe "more complicated case" do
     ])
   end
 
-  specify "sorting with nulls (1 grouper)" do
+  it "sorting with nulls (1 grouper)" do
     expect(data_by(:author, sort_desc: true)).to match_report_data([
       { key: woolf.name, values: [
         { key: :count, value: 3 },

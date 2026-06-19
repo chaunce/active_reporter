@@ -40,6 +40,7 @@ require "factory_bot_rails"
 require "pry"
 require "byebug"
 require "ostruct"
+require "faker"
 
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
