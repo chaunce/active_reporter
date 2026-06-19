@@ -67,5 +67,16 @@ describe ActiveReporter::Dimension::Number do
       dimension = new_dimension(only: { min: 0, max: 5 })
       expect(dimension.bin_width).to eq 0.5
     end
+
+    it "is 1 when the domain is zero" do
+      expect(new_dimension(only: { min: 5, max: 5 }).bin_width).to eq 1
+    end
+  end
+
+  describe "#group_values" do
+    it "produces no bins when the min exceeds the max" do
+      dimension = new_dimension(only: { min: 10, max: 5 })
+      expect(dimension.group_values).to eq []
+    end
   end
 end

@@ -14,11 +14,18 @@ module ActiveReporter
       value.is_a?(Numeric) || value.is_a?(String) && value =~ /\A\d+(?:\.\d+)?\z/
     end
 
+    def deprecator
+      @deprecator ||= ActiveSupport::Deprecation.new("1.0", "ActiveReporter")
+    end
+
     private
 
     def database_adapter
       @database_adapter ||= if ActiveRecord.gem_version < Gem::Version.new("6.1")
+        # ActiveReporter requires Rails >= 7.1, so this legacy branch is unreachable.
+        # :nocov:
         ActiveRecord::Base.connection_config[:adapter]
+        # :nocov:
       else
         ActiveRecord::Base.connection_db_config.adapter
       end

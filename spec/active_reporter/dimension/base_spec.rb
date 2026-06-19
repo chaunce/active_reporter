@@ -99,4 +99,33 @@ describe ActiveReporter::Dimension::Base do
       expect(dimension.expression).to eq "baz.bat"
     end
   end
+
+  describe "abstract interface" do
+    it "raises NotImplementedError for #filter, #group, and #group_values" do
+      dimension = new_dimension
+
+      expect { dimension.filter(nil) }.to raise_error(NotImplementedError)
+      expect { dimension.group(nil) }.to raise_error(NotImplementedError)
+      expect { dimension.group_values }.to raise_error(NotImplementedError)
+    end
+  end
+
+  describe "deprecations" do
+    it "warns when the deprecated :expression option is used" do
+      expect(ActiveReporter.deprecator).to receive(:warn)
+
+      new_dimension({}, {}, expression: "foo.bar")
+    end
+  end
+
+  describe "#enum?" do
+    it "is false when the attribute is not a model enum" do
+      expect(new_dimension.send(:enum?)).to be false
+    end
+
+    it "is true when the attribute is a model enum" do
+      dimension = new_dimension({}, {}, model: :post, attribute: :status)
+      expect(dimension.send(:enum?)).to be true
+    end
+  end
 end

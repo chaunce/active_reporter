@@ -26,7 +26,7 @@ module ActiveReporter
 
       def validate_params!
         if opts.include?(:expression)
-          ActiveSupport::Deprecation.warn("passing an :expression option will be deprecated in version 1.0\n  please use :attribute, and, when required, :model or :table_name")
+          ActiveReporter.deprecator.warn("passing an :expression option will be deprecated in version 1.0\n  please use :attribute, and, when required, :model or :table_name")
         end
       end
 
@@ -66,7 +66,7 @@ module ActiveReporter
       end
 
       def enum?
-        false # Hash(model&.defined_enums).include?(attribute.to_s)
+        Hash(model&.defined_enums).include?(attribute.to_s)
       end
     end
   end

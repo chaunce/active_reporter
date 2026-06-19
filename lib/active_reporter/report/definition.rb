@@ -119,12 +119,12 @@ module ActiveReporter
           aggregators.keys + calculators.keys + trackers.keys
         end
 
-        METRICS.each do |type, mertics|
-          mertics.each do |mertic|
+        METRICS.each do |type, metrics|
+          metrics.each do |metric|
             class_eval <<-METRIC_HELPERS, __FILE__, __LINE__ + 1
-              def #{mertic}_#{type}(name, opts = {}, &block)
+              def #{metric}_#{type}(name, opts = {}, &block)
                 opts[:block] = block if block_given?
-                #{type}(name, #{(type.to_s + "/" + mertic.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
+                #{type}(name, #{(type.to_s + "/" + metric.to_s.singularize(:_gem_active_reporter)).camelize.sub(/.*\./, "")}, opts)
               end
             METRIC_HELPERS
           end
@@ -173,8 +173,15 @@ module ActiveReporter
             if column_name.present?
               category_dimension name, expression: "#{reflection.klass.table_name}.#{column_name}", relation: ->(r) { r.joins(name) }
             else
+              # autoreport edge: a FK association whose klass has no name-like column.
+              # :nocov:
               category_dimension column.name
+              # :nocov:
             end
+          when report_model.defined_enums.key?(column.name)
+            enum_dimension column.name
+          when column.type == :boolean
+            boolean_dimension column.name
           when %i[datetime timestamp time date].include?(column.type)
             time_dimension column.name
           when %i[integer float decimal].include?(column.type)

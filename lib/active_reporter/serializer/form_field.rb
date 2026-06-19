@@ -12,7 +12,7 @@ module ActiveReporter
       end
 
       def aggregator_options
-        @agg_opts ||= report.all_aggregators.map { |name, agg| [human_aggregator_label(agg), name] }
+        @agg_opts ||= report.all_aggregators.map { |name, agg| [human_aggregator_label(name => agg), name] }
       end
 
       def dimension_options
@@ -47,7 +47,7 @@ module ActiveReporter
       def field_for(dimension)
         case dimension
         when ActiveReporter::Dimension::Category then category_dimension_field(dimension)
-        when ActiveReporter::Dimension::Set then bin_dimension_field(dimension)
+        when ActiveReporter::Dimension::Bin then bin_dimension_field(dimension)
         end
       end
 

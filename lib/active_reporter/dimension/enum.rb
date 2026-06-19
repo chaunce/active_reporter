@@ -17,7 +17,10 @@ module ActiveReporter
         values = if Rails.gem_version >= Gem::Version.new("7")
           filter_values.map { |value| enum_values[value] }.uniq
         else
+          # ActiveReporter requires Rails >= 7.1, so this legacy branch is unreachable.
+          # :nocov:
           filter_values
+          # :nocov:
         end
         query = case values
         when [] then "1=0"

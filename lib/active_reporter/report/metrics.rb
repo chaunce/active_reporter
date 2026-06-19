@@ -61,8 +61,10 @@ module ActiveReporter
         aggregators.merge(calculators).merge(trackers).merge(evaluators)
       end
 
+      # The grouper dimensions followed by the calculator, tracker, and
+      # evaluator names that appear alongside them in report rows.
       def fields
-        [groupers, calculators.keys, trackers.keys, evaluators.keys].inject(&:merge)
+        [groupers, calculators.keys, trackers.keys, evaluators.keys].flatten
       end
 
       def total_report

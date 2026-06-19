@@ -54,6 +54,15 @@ describe ActiveReporter::Report do
       expect(report_model.dimensions[:likes][:axis_class]).to eq ActiveReporter::Dimension::Number
     end
 
+    it "should store enum columns as Enum dimensions" do
+      expect(report_model.dimensions[:status][:axis_class]).to eq ActiveReporter::Dimension::Enum
+      expect(report_model.dimensions[:category][:axis_class]).to eq ActiveReporter::Dimension::Enum
+    end
+
+    it "should store boolean columns as Boolean dimensions" do
+      expect(report_model.dimensions[:featured][:axis_class]).to eq ActiveReporter::Dimension::Boolean
+    end
+
     it "should properly store title dimension class" do
       expect(report_model.dimensions[:title][:axis_class]).to eq ActiveReporter::Dimension::Category
     end
@@ -346,6 +355,33 @@ describe ActiveReporter::Report do
     end
   end
 
+  describe "#fields" do
+    let(:report_model) do
+      Class.new(ActiveReporter::Report) do
+        report_on :Post
+        count_aggregator :count
+        sum_aggregator :likes
+        number_dimension :likes
+        category_dimension :title
+        delta_tracker :likes_delta, aggregator: :likes
+        block_evaluator(:flag) { |_key, _row, _report| true }
+      end
+    end
+
+    let(:report) do
+      report_model.new(groupers: %i[likes title], aggregators: %i[count likes], trackers: %i[likes_delta], evaluators: %i[flag])
+    end
+
+    it "lists the grouper dimensions followed by calculator, tracker, and evaluator names" do
+      expect(report.fields).to eq [
+        report.dimensions[:likes],
+        report.dimensions[:title],
+        :likes_delta,
+        :flag,
+      ]
+    end
+  end
+
   describe "#dimensions" do
     it "is a curried hash" do
       expect(report_model.dimensions.keys).to include(:likes, :author, :created_at)
@@ -394,7 +430,7 @@ describe ActiveReporter::Report do
     context "where author dimension only allows empty string" do
       let(:report) { report_model.new(dimensions: { author: { only: "" }}) }
 
-      it "strips empty string but preserves nil by default" do
+      it "treats a blank-only filter as no filter" do
         expect(report.params).to be_blank
         expect(report.dimensions[:author].filter_values).to be_blank
         expect(report.records).to contain_exactly(*all_posts)
@@ -404,7 +440,7 @@ describe ActiveReporter::Report do
     context "where author dimension only allows array of empty string" do
       let(:report) { report_model.new(dimensions: { author: { only: [""] }}) }
 
-      it "strips empty string but preserves nil by default" do
+      it "treats an array of only blanks as no filter" do
         expect(report.params).to be_blank
         expect(report.dimensions[:author].filter_values).to be_blank
         expect(report.records).to contain_exactly(*all_posts)
@@ -414,7 +450,7 @@ describe ActiveReporter::Report do
     context "where author dimension only allows empty string or Phil" do
       let(:report) { report_model.new(dimensions: { author: { only: ["", author_phil.name] }}) }
 
-      it "strips empty string but preserves nil by default" do
+      it "strips blank values but keeps the real ones" do
         expect(report.params).to be_present
         expect(report.dimensions[:author].filter_values).to contain_exactly(author_phil.name)
         expect(report.records).to contain_exactly(*author_phil_posts)
@@ -424,7 +460,7 @@ describe ActiveReporter::Report do
     context "where author dimension strips blank values and only allows empty string" do
       let(:report) { report_model.new(strip_blanks: false, dimensions: { author: { only: "" }}) }
 
-      it "strips empty string but preserves nil by default" do
+      it "keeps blank values when strip_blanks is false" do
         expect(report.params).to be_present
         expect(report.dimensions[:author].filter_values).to eq([""])
         expect(report.records).to be_empty
@@ -434,7 +470,7 @@ describe ActiveReporter::Report do
     context "where author dimension only allows nil" do
       let(:report) { report_model.new(dimensions: { author: { only: nil }}) }
 
-      it "strips empty string but preserves nil by default" do
+      it "keeps an explicit nil as a filter for missing values" do
         expect(report.params).to be_present
         expect(report.dimensions[:author].filter_values).to eq [nil]
         expect(report.records).to be_empty
@@ -592,6 +628,171 @@ describe ActiveReporter::Report do
           ["totals", "likes_ratio"] => author_tammy_posts_likes_ratio
         })
       end
+    end
+  end
+
+  describe "parameter validation" do
+    context "with a calculator that references an undefined aggregator" do
+      let(:report_model) do
+        Class.new(ActiveReporter::Report) do
+          report_on :Post
+          count_aggregator :count
+          number_dimension :likes
+          ratio_calculator :bad_ratio, aggregator: :nope
+        end
+      end
+      let(:parent_report) { report_model.new(groupers: [:likes], aggregators: [:count]) }
+
+      it "raises an InvalidParamsError naming the calculator" do
+        expect {
+          report_model.new(groupers: [:likes], aggregators: [:count], calculators: [:bad_ratio], parent_report: parent_report)
+        }.to raise_error(ActiveReporter::InvalidParamsError, /bad_ratio defines an invalid aggregator/)
+      end
+    end
+
+    context "with a tracker that references an undefined aggregator" do
+      let(:report_model) do
+        Class.new(ActiveReporter::Report) do
+          report_on :Post
+          count_aggregator :count
+          number_dimension :likes
+          delta_tracker :bad_delta, aggregator: :nope
+        end
+      end
+
+      it "raises an InvalidParamsError naming the tracker" do
+        expect {
+          report_model.new(groupers: [:likes], aggregators: [:count], trackers: [:bad_delta])
+        }.to raise_error(ActiveReporter::InvalidParamsError, /bad_delta defines an invalid aggregator/)
+      end
+    end
+
+    context "with a tracker that references an undefined prior aggregator" do
+      let(:report_model) do
+        Class.new(ActiveReporter::Report) do
+          report_on :Post
+          count_aggregator :count
+          number_dimension :likes
+          delta_tracker :bad_prior, aggregator: :count, prior_aggregator: :nope
+        end
+      end
+
+      it "raises an InvalidParamsError naming the prior aggregator" do
+        expect {
+          report_model.new(groupers: [:likes], aggregators: [:count], trackers: [:bad_prior])
+        }.to raise_error(ActiveReporter::InvalidParamsError, /invalid prior aggregator/)
+      end
+    end
+
+    context "when multiple configuration errors are present" do
+      let(:report_model) do
+        Class.new(ActiveReporter::Report) do
+          report_on :Post
+          count_aggregator :count
+          number_dimension :likes
+          delta_tracker :bad_a, aggregator: :nope
+          delta_tracker :bad_b, aggregator: :nope
+        end
+      end
+
+      it "reports every error in a single message" do
+        expect {
+          report_model.new(groupers: [:likes], aggregators: [:count], trackers: %i[bad_a bad_b])
+        }.to raise_error(ActiveReporter::InvalidParamsError, /errors:.*bad_a.*bad_b/m)
+      end
+    end
+
+    context "with a calculator whose valid aggregator was not requested" do
+      # likes_ratio's aggregator (:likes) is valid but not in the requested
+      # aggregators, so it is added automatically rather than erroring.
+      let(:parent_report) { report_model.new(groupers: %i[author], aggregators: %i[count likes]) }
+
+      it "auto-adds the aggregator and builds successfully" do
+        expect {
+          report_model.new(groupers: %i[author], aggregators: [:count], calculators: [:likes_ratio], parent_report: parent_report)
+        }.not_to raise_error
+      end
+    end
+
+    context "with a tracker whose valid aggregator was not requested" do
+      it "auto-adds the aggregator and builds successfully" do
+        expect {
+          report_model.new(groupers: %i[author], aggregators: [:count], trackers: [:likes_delta])
+        }.not_to raise_error
+      end
+    end
+
+    context "with a tracker whose valid prior_aggregator was not requested" do
+      let(:report_model) do
+        Class.new(ActiveReporter::Report) do
+          report_on :Post
+          count_aggregator :count
+          sum_aggregator :likes
+          number_dimension :likes
+          delta_tracker :paced, aggregator: :count, prior_aggregator: :likes
+        end
+      end
+
+      it "auto-adds the prior aggregator and builds successfully" do
+        expect {
+          report_model.new(groupers: [:likes], aggregators: [:count], trackers: [:paced])
+        }.not_to raise_error
+      end
+    end
+  end
+
+  # These guards are unreachable through the public initializer today because
+  # metric names are sliced against the class definition before validation runs.
+  # They remain as defense-in-depth, so we exercise them directly by stubbing the
+  # metric collections to simulate a future code path that bypasses that slicing.
+  describe "defense-in-depth validation guards" do
+    let(:report_model) do
+      Class.new(ActiveReporter::Report) do
+        report_on :Post
+        count_aggregator :count
+        number_dimension :likes
+      end
+    end
+    let(:report) { report_model.new(groupers: [:likes], aggregators: [:count]) }
+
+    before { report.errors = nil }
+
+    it "flags an aggregator that is not defined on the class" do
+      allow(report).to receive(:aggregators).and_return(count: nil, bogus: nil)
+
+      report.validate_aggregators!
+
+      expect(report.errors).to include(/:bogus is not a valid aggregator/)
+    end
+
+    it "flags a calculator that is unknown or missing an aggregator" do
+      calculator = double("calculator", name: :bogus, aggregator: nil)
+      allow(report).to receive(:calculators).and_return(bogus: calculator)
+
+      report.validate_calculators!
+
+      expect(report.errors).to include(
+        a_string_matching(/:bogus is not a valid calculator/),
+        a_string_matching(/:bogus must define an aggregator/)
+      )
+    end
+
+    it "flags a tracker that is unknown or missing an aggregator" do
+      tracker = double("tracker", name: :bogus, aggregator: nil, opts: {})
+      allow(report).to receive(:trackers).and_return(bogus: tracker)
+
+      report.validate_trackers!
+
+      expect(report.errors).to include(
+        a_string_matching(/:bogus is not a valid tracker/),
+        a_string_matching(/:bogus must define an aggregator/)
+      )
+    end
+
+    it "accumulates arbitrary errors via add_error" do
+      report.send(:add_error, "boom")
+
+      expect(report.errors).to eq ["boom"]
     end
   end
 end
