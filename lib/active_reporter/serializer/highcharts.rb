@@ -22,47 +22,6 @@ module ActiveReporter
         color_hash[dimension.name][value]
       end
 
-      # def series
-      #   case report.groupers.count
-      #   when 2
-      #     dim1, dim2 = report.groupers
-      #     report.data.flat_map.with_index do |d2, i|
-      #       d2[:values].map do |d1|
-      #         {
-      #           stack: human_dimension_value_label(dim2, d2[:key]),
-      #           name: human_dimension_value_label(dim1, d1[:key]),
-      #           (i == 0 ? :id : :linkedTo) => human_dimension_value_label(dim1, d1[:key]),
-      #           color: color_for(dim1, d1[:key]),
-      #           data: d1[:values].map do |k,v|
-      #             {
-      #               y: v.to_f,
-      #               tooltip: tooltip_for(k => v, dim1 => d1),
-      #               filters: filters_for(k => v, dim1 => d1)
-      #             }
-      #           end
-      #         }
-      #       end
-      #     end
-      #   when 1
-      #     dim1 = report.groupers.first
-      #     report.data.map do |d1|
-      #       {
-      #         name: human_dimension_value_label(dim1, d1[:key]),
-      #         color: color_for(dim1, d1[:key]),
-      #         data: d1[:values].map do |k,v|
-      #           {
-      #             y: v.to_f,
-      #             tooltip: tooltip_for(k => v, dim1 => d1),
-      #             filters: filters_for(k => v, dim1 => d1)
-      #           }
-      #         end
-      #       }
-      #     end
-      #   else
-      #     raise ActiveReporter::InvalidParamsError, "report must have <= 2 groupers"
-      #   end
-      # end
-
       def series
         case report.groupers.count
         when 3

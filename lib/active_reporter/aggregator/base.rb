@@ -24,10 +24,9 @@ module ActiveReporter
 
       private
 
+      # Validation hook run on initialize; aggregator subclasses may override and
+      # `super` into it to validate their params.
       def validate_params!
-        if opts.include?(:expression)
-          ActiveReporter.deprecator.warn("passing an :expression option will be deprecated in version 1.0\n  please use :attribute, and, when required, :model or :table_name")
-        end
       end
 
       def relate(groups)
@@ -47,14 +46,7 @@ module ActiveReporter
       end
 
       def table_name
-        return @table_name unless @table_name.nil?
-
-        @table_name = opts[:table_name]
-        @table_name = model.try(:table_name) if @table_name.nil?
-        @table_name = model.to_s.constantize.try(:table_name) rescue nil if @table_name.nil?
-        @table_name = report.table_name if @table_name.nil?
-
-        @table_name
+        @table_name ||= opts[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
       end
 
       def column
@@ -62,7 +54,7 @@ module ActiveReporter
       end
 
       def expression
-        opts.fetch(:expression, "#{table_name}.#{column}")
+        "#{table_name}.#{column}"
       end
 
       def enum?

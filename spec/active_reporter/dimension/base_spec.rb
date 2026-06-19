@@ -110,14 +110,6 @@ describe ActiveReporter::Dimension::Base do
     end
   end
 
-  describe "deprecations" do
-    it "warns when the deprecated :expression option is used" do
-      expect(ActiveReporter.deprecator).to receive(:warn)
-
-      new_dimension({}, {}, expression: "foo.bar")
-    end
-  end
-
   describe "#enum?" do
     it "is false when the attribute is not a model enum" do
       expect(new_dimension.send(:enum?)).to be false

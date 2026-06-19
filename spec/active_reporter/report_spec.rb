@@ -71,22 +71,11 @@ describe ActiveReporter::Report do
       expect(report_model.dimensions[:author][:axis_class]).to eq ActiveReporter::Dimension::Category
     end
 
-    context "with expression" do
-      let!(:report_model) do
-        Class.new(ActiveReporter::Report) do
-          report_on :Post
-          count_aggregator :count
-          sum_aggregator :likes
-          number_dimension :likes
-          category_dimension :author, expression: "authors.name", relation: ->(r) { r.joins(:author) }
-          time_dimension :created_at
-          ratio_calculator :likes_ratio, aggregator: :likes
-          delta_tracker :likes_delta, aggregator: :likes
-        end
-      end
+    context "for a belongs_to association" do
+      it "derives the dimension expression from the association's table and name column" do
+        report = report_model.new(groupers: %i[author])
 
-      it "should properly store author expression" do
-        expect(report_model.dimensions[:author][:opts][:expression]).to eq "authors.name"
+        expect(report.dimensions[:author].expression).to eq "authors.name"
       end
     end
   end

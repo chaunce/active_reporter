@@ -31,7 +31,7 @@ module ActiveReporter
         end
 
         def dimensions
-          @dimensions ||= { totals: { axis_class: Dimension::Category, opts: { _expression: "'totals'" } } }
+          @dimensions ||= { totals: { axis_class: Dimension::Category, opts: { _alias: :totals } } }
         end
 
         # Aggregators calculate the statistical data for the report into each dimension group. After grouping the data
@@ -171,7 +171,7 @@ module ActiveReporter
           when reflection.present?
             column_name = (reflection.klass.column_names & autoreport_association_name_columns(reflection)).first
             if column_name.present?
-              category_dimension name, expression: "#{reflection.klass.table_name}.#{column_name}", relation: ->(r) { r.joins(name) }
+              category_dimension name, table_name: reflection.klass.table_name, attribute: column_name, relation: ->(r) { r.joins(name) }
             else
               # autoreport edge: a FK association whose klass has no name-like column.
               # :nocov:

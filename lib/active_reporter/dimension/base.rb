@@ -24,7 +24,7 @@ module ActiveReporter
       end
 
       def expression
-        @expression ||= opts[:expression] || opts[:_expression] || "#{table_name}.#{column}"
+        @expression ||= opts.include?(:_alias) ? "'#{opts[:_alias]}'" : "#{table_name}.#{column}"
       end
 
       # Do any joins/selects necessary to filter or group the relation.
@@ -99,10 +99,9 @@ module ActiveReporter
 
       private
 
+      # Validation hook run on initialize; subclasses (Bin/Number/Time) override
+      # this and `super` into it to validate their dimension params.
       def validate_params!
-        if opts.include?(:expression)
-          ActiveReporter.deprecator.warn("passing an :expression option will be deprecated in version 1.0\n  please use :attribute, and, when required, :model or :table_name")
-        end
       end
 
       def invalid_param!(param_key, message)
@@ -110,14 +109,7 @@ module ActiveReporter
       end
 
       def table_name
-        return @table_name unless @table_name.nil?
-
-        @table_name = opts[:table_name]
-        @table_name = model.try(:table_name) if @table_name.nil?
-        @table_name = model.to_s.constantize.try(:table_name) rescue nil if @table_name.nil?
-        @table_name = report.table_name if @table_name.nil?
-
-        @table_name
+        @table_name ||= opts[:table_name] || model.try(:table_name) || model.to_s.safe_constantize.try(:table_name) || report.table_name
       end
 
       def column
